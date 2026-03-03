@@ -11,7 +11,11 @@ class SchoolYearSeeder extends Seeder
     {
         SchoolYear::updateOrCreate(
             ['name' => '2026-2027'],
-            ['is_active' => true, 'enrollment_open' => true]
+            [
+                'year' => '2026-2027',
+                'is_active' => true,
+                'is_enrollment_open' => true,
+            ]
         );
     }
 }

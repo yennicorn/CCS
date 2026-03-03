@@ -35,7 +35,7 @@
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="js-logout-form">
                     @csrf
-                    <button class="btn btn-secondary" type="submit">Logout</button>
+                    <button class="btn btn-logout" type="submit">Logout</button>
                 </form>
             </div>
         </div>
@@ -69,7 +69,7 @@
         <h2 id="logoutConfirmTitle">Confirm Logout</h2>
         <p id="logoutConfirmDesc">Are you sure you want to log out from your account?</p>
         <div class="logout-modal__actions">
-            <button type="button" class="btn btn-secondary" data-dismiss-logout>Cancel</button>
+            <button type="button" class="btn btn-logout" data-dismiss-logout>Cancel</button>
             <button type="button" class="btn" id="logoutConfirmBtn">Log Out</button>
         </div>
     </div>

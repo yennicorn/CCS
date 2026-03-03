@@ -9,11 +9,14 @@
 <a class="sidebar-link {{ request()->routeIs('master.dashboard') ? 'active' : '' }}" href="{{ route('master.dashboard') }}">
     <span class="nav-ico"><x-icon name="dashboard" /></span> Dashboard
 </a>
-<a class="sidebar-link {{ request()->routeIs('master.enrollment') ? 'active' : '' }}" href="{{ route('master.enrollment') }}">
-    <span class="nav-ico"><x-icon name="enrollment" /></span> Manage Enrollment
-</a>
 <a class="sidebar-link {{ request()->routeIs('master.monitoring*') ? 'active' : '' }}" href="{{ route('master.monitoring') }}">
-    <span class="nav-ico"><x-icon name="monitor" /></span> Monitoring
+    <span class="nav-ico"><x-icon name="monitor" /></span> Manage Enrollment
+</a>
+<a class="sidebar-link {{ request()->routeIs('master.enrolled-students') ? 'active' : '' }}" href="{{ route('master.enrolled-students') }}">
+    <span class="nav-ico"><x-icon name="users" /></span> Enrolled Students
+</a>
+<a class="sidebar-link {{ request()->routeIs('master.enrollment-history') ? 'active' : '' }}" href="{{ route('master.enrollment-history') }}">
+    <span class="nav-ico"><x-icon name="logs" /></span> Enrollment History
 </a>
 <a class="sidebar-link {{ request()->routeIs('master.school-years.*') ? 'active' : '' }}" href="{{ route('master.school-years.index') }}">
     <span class="nav-ico"><x-icon name="school-year" /></span> School Year Control

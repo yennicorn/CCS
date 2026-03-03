@@ -27,17 +27,23 @@ class HomepageController extends Controller
 
     public function enrollment()
     {
-        $activeSchoolYear = SchoolYear::where('is_active', true)->first();
-        $application = Application::where('user_id', auth()->id())->latest()->first();
+        $activeSchoolYears = SchoolYear::where('is_active', true)->get();
+        $activeSchoolYear = $activeSchoolYears->count() === 1 ? $activeSchoolYears->first() : null;
+        $isEnrollmentOpen = $activeSchoolYear?->isEnrollmentOpenNow() ?? false;
+        $applications = Application::where('user_id', auth()->id())
+            ->latest('submitted_at')
+            ->latest('created_at')
+            ->get();
+        $latestApplication = $applications->first();
 
-        if ($application) {
-            $application->load([
+        if ($applications->isNotEmpty()) {
+            $applications->load([
                 'statusLogs' => fn ($query) => $query->orderBy('changed_at'),
                 'statusLogs.changedBy',
                 'documents',
             ]);
         }
 
-        return view('enduser.homepage', compact('activeSchoolYear', 'application'));
+        return view('enduser.homepage', compact('activeSchoolYear', 'applications', 'latestApplication', 'isEnrollmentOpen'));
     }
 }

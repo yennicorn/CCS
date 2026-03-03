@@ -33,9 +33,9 @@
             <label>Email Address</label>
             <input type="email" name="email" value="{{ old('email') }}" required>
 
-            <label>Role</label>
+            <label>Parent or a Student?</label>
             <select name="role" required>
-                <option value="">Select Role</option>
+                <option value=""></option>
                 <option value="parent" {{ old('role')==='parent'?'selected':'' }}>Parent</option>
                 <option value="student" {{ old('role')==='student'?'selected':'' }}>Student</option>
             </select>

@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
-    private const GRADE_LEVELS = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
+    private const GRADE_LEVELS = ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
 
     private const DISABILITY_TYPES = [
         'visual_impairment',
@@ -32,8 +32,13 @@ class ApplicationController extends Controller
     public function store(Request $request)
     {
         abort_unless(in_array($request->user()->role, ['parent', 'student'], true), 403);
-        $schoolYear = SchoolYear::where('is_active', true)->first();
-        if (!$schoolYear || !$schoolYear->enrollment_open) {
+        $activeSchoolYears = SchoolYear::where('is_active', true)->get();
+        if ($activeSchoolYears->count() !== 1) {
+            return back()->withErrors(['application' => 'Enrollment is unavailable. Please contact the administrator.']);
+        }
+
+        $schoolYear = $activeSchoolYears->first();
+        if (!$schoolYear || !$schoolYear->isEnrollmentOpenNow()) {
             return back()->withErrors(['application' => 'Enrollment is closed.']);
         }
 
@@ -167,57 +172,72 @@ class ApplicationController extends Controller
 
     private function payloadFromValidated(array $validated): array
     {
-        $middle = trim((string) ($validated['middle_name'] ?? ''));
+        $middle = $this->upperOrEmpty($validated['middle_name'] ?? null);
         $fullName = trim(
-            ($validated['last_name'] ?? '').', '.($validated['first_name'] ?? '').($middle !== '' ? ' '.$middle : '')
+            $this->upperOrEmpty($validated['last_name'] ?? null).', '.$this->upperOrEmpty($validated['first_name'] ?? null).($middle !== '' ? ' '.$middle : '')
         );
 
         return [
             'learner_full_name' => $fullName,
             'grade_level' => $validated['grade_level'],
             'with_lrn' => (bool) $validated['with_lrn'],
-            'lrn' => $validated['with_lrn'] ? ($validated['lrn'] ?? null) : null,
+            'lrn' => $validated['with_lrn'] ? $this->upperOrNull($validated['lrn'] ?? null) : null,
             'returning_learner' => (bool) $validated['returning_learner'],
-            'psa_birth_certificate_no' => $validated['psa_birth_certificate_no'] ?? null,
-            'last_name' => $validated['last_name'],
-            'first_name' => $validated['first_name'],
-            'middle_name' => $validated['middle_name'] ?? null,
+            'psa_birth_certificate_no' => $this->upperOrNull($validated['psa_birth_certificate_no'] ?? null),
+            'last_name' => $this->upperOrEmpty($validated['last_name'] ?? null),
+            'first_name' => $this->upperOrEmpty($validated['first_name'] ?? null),
+            'middle_name' => $this->upperOrNull($validated['middle_name'] ?? null),
             'birthdate' => $validated['birthdate'],
-            'place_of_birth' => $validated['place_of_birth'],
+            'place_of_birth' => $this->upperOrEmpty($validated['place_of_birth'] ?? null),
             'gender' => $validated['gender'],
-            'mother_tongue' => $validated['mother_tongue'] ?? null,
+            'mother_tongue' => $this->upperOrNull($validated['mother_tongue'] ?? null),
             'has_ip_affiliation' => (bool) $validated['has_ip_affiliation'],
-            'ip_affiliation' => $validated['has_ip_affiliation'] ? ($validated['ip_affiliation'] ?? null) : null,
+            'ip_affiliation' => $validated['has_ip_affiliation'] ? $this->upperOrNull($validated['ip_affiliation'] ?? null) : null,
             'is_4ps_beneficiary' => (bool) $validated['is_4ps_beneficiary'],
-            'four_ps_household_id' => $validated['is_4ps_beneficiary'] ? ($validated['four_ps_household_id'] ?? null) : null,
+            'four_ps_household_id' => $validated['is_4ps_beneficiary'] ? $this->upperOrNull($validated['four_ps_household_id'] ?? null) : null,
             'is_lwd' => (bool) $validated['is_lwd'],
             'disability_types' => $validated['is_lwd'] ? ($validated['disability_types'] ?? []) : [],
-            'current_house_no' => $validated['current_house_no'] ?? null,
-            'current_street' => $validated['current_street'] ?? null,
-            'current_barangay' => $validated['current_barangay'] ?? null,
-            'current_municipality' => $validated['current_municipality'] ?? null,
-            'current_province' => $validated['current_province'] ?? null,
-            'current_country' => $validated['current_country'] ?? null,
-            'current_zip_code' => $validated['current_zip_code'] ?? null,
-            'permanent_house_no' => $validated['permanent_house_no'] ?? null,
-            'permanent_street' => $validated['permanent_street'] ?? null,
-            'permanent_barangay' => $validated['permanent_barangay'] ?? null,
-            'permanent_municipality' => $validated['permanent_municipality'] ?? null,
-            'permanent_province' => $validated['permanent_province'] ?? null,
-            'permanent_country' => $validated['permanent_country'] ?? null,
-            'permanent_zip_code' => $validated['permanent_zip_code'] ?? null,
-            'father_last_name' => $validated['father_last_name'] ?? null,
-            'father_first_name' => $validated['father_first_name'] ?? null,
-            'father_middle_name' => $validated['father_middle_name'] ?? null,
-            'father_contact_number' => $validated['father_contact_number'] ?? null,
-            'mother_last_name' => $validated['mother_last_name'] ?? null,
-            'mother_first_name' => $validated['mother_first_name'] ?? null,
-            'mother_middle_name' => $validated['mother_middle_name'] ?? null,
-            'mother_contact_number' => $validated['mother_contact_number'] ?? null,
-            'guardian_last_name' => $validated['guardian_last_name'] ?? null,
-            'guardian_first_name' => $validated['guardian_first_name'] ?? null,
-            'guardian_middle_name' => $validated['guardian_middle_name'] ?? null,
-            'guardian_contact_number' => $validated['guardian_contact_number'] ?? null,
+            'current_house_no' => $this->upperOrNull($validated['current_house_no'] ?? null),
+            'current_street' => $this->upperOrNull($validated['current_street'] ?? null),
+            'current_barangay' => $this->upperOrNull($validated['current_barangay'] ?? null),
+            'current_municipality' => $this->upperOrNull($validated['current_municipality'] ?? null),
+            'current_province' => $this->upperOrNull($validated['current_province'] ?? null),
+            'current_country' => $this->upperOrNull($validated['current_country'] ?? null),
+            'current_zip_code' => $this->upperOrNull($validated['current_zip_code'] ?? null),
+            'permanent_house_no' => $this->upperOrNull($validated['permanent_house_no'] ?? null),
+            'permanent_street' => $this->upperOrNull($validated['permanent_street'] ?? null),
+            'permanent_barangay' => $this->upperOrNull($validated['permanent_barangay'] ?? null),
+            'permanent_municipality' => $this->upperOrNull($validated['permanent_municipality'] ?? null),
+            'permanent_province' => $this->upperOrNull($validated['permanent_province'] ?? null),
+            'permanent_country' => $this->upperOrNull($validated['permanent_country'] ?? null),
+            'permanent_zip_code' => $this->upperOrNull($validated['permanent_zip_code'] ?? null),
+            'father_last_name' => $this->upperOrNull($validated['father_last_name'] ?? null),
+            'father_first_name' => $this->upperOrNull($validated['father_first_name'] ?? null),
+            'father_middle_name' => $this->upperOrNull($validated['father_middle_name'] ?? null),
+            'father_contact_number' => $this->upperOrNull($validated['father_contact_number'] ?? null),
+            'mother_last_name' => $this->upperOrNull($validated['mother_last_name'] ?? null),
+            'mother_first_name' => $this->upperOrNull($validated['mother_first_name'] ?? null),
+            'mother_middle_name' => $this->upperOrNull($validated['mother_middle_name'] ?? null),
+            'mother_contact_number' => $this->upperOrNull($validated['mother_contact_number'] ?? null),
+            'guardian_last_name' => $this->upperOrNull($validated['guardian_last_name'] ?? null),
+            'guardian_first_name' => $this->upperOrNull($validated['guardian_first_name'] ?? null),
+            'guardian_middle_name' => $this->upperOrNull($validated['guardian_middle_name'] ?? null),
+            'guardian_contact_number' => $this->upperOrNull($validated['guardian_contact_number'] ?? null),
         ];
+    }
+
+    private function upperOrNull(?string $value): ?string
+    {
+        $normalized = trim((string) $value);
+        if ($normalized === '') {
+            return null;
+        }
+
+        return strtoupper($normalized);
+    }
+
+    private function upperOrEmpty(?string $value): string
+    {
+        return strtoupper(trim((string) $value));
     }
 }

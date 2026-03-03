@@ -10,8 +10,8 @@
         <p class="muted">Status: <span class="badge {{ $application->status }}">{{ strtoupper($application->status) }}</span></p>
     </div>
     <div class="action-row">
-        <a class="btn btn-secondary" href="{{ route('master.monitoring') }}">Back to Monitoring</a>
-        <button class="btn" type="button" onclick="window.print()">Print A4</button>
+        <a class="btn btn-secondary" href="{{ route('master.monitoring') }}">Return</a>
+        <button class="btn" type="button" onclick="window.print()">Print</button>
     </div>
 
     @if(!$canEdit)
@@ -25,13 +25,12 @@
         <div class="alert alert-success mt-10">Edit mode unlocked for this form. Save your updates below.</div>
     @endif
 </section>
-
+No, the inputs will appear, just follow the alignment and the structure of the form to be fit in a one A4 bonpaper to avoid being cut and using another bondpaper
 <section class="enrollment-paper-wrap">
     <article class="enrollment-paper">
-        <div class="enrollment-paper-head">
-            <h3>Basic Education Enrollment Form</h3>
-            <p>Cabugbugan Community School | Annex 1</p>
-        </div>
+        @include('enduser.partials.enrollment-paper-head', [
+            'application' => $application,
+        ])
 
         @if($canEdit)
             <form method="POST" action="{{ route('master.monitoring.update', $application) }}">

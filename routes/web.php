@@ -15,13 +15,7 @@ use App\Http\Controllers\Master\SettingsController;
 use App\Http\Controllers\Master\UserManagementController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\WelcomeController;
-use App\Models\User;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/dashboard', function () {
@@ -30,9 +24,9 @@ Route::get('/dashboard', function () {
     }
 
     return match (auth()->user()->role) {
-        'super_admin' => redirect('/super-dashboard'),
-        'admin' => redirect('/admin-dashboard'),
-        default => redirect('/homepage'),
+        'super_admin' => redirect()->route('master.dashboard'),
+        'admin' => redirect()->route('admin.dashboard'),
+        default => redirect()->route('homepage'),
     };
 })->name('dashboard');
 Route::get('/home', fn () => redirect()->route('dashboard'));
@@ -53,47 +47,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-    Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
-    Route::post('/forgot-password', function (Request $request) {
-        $request->validate(['email' => 'required|email']);
-        $status = Password::sendResetLink($request->only('email'));
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
-    })->name('password.email');
-
-    Route::get('/reset-password/{token}', function (string $token) {
-        return view('auth.reset-password', [
-            'token' => $token,
-            'email' => request('email'),
-        ]);
-    })->name('password.reset');
-
-    Route::post('/reset-password', function (Request $request) {
-        $request->validate([
-            'token' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?!.*[;:"\'\/\.])(?=\S+$).{8,20}$/'],
-        ]);
-
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                    'force_password_change' => false,
-                ])->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('success', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
-    })->name('password.update');
+    Route::redirect('/forgot-password', '/forgot-password/parent-student');
+    Route::view('/forgot-password/parent-student', 'auth.forgot-password-parent-student')->name('password.request.parent-student');
+    Route::post('/forgot-password/parent-student', [AuthController::class, 'recoverParentStudentPassword'])->name('password.recover.parent-student');
 });
 
 // Logout must always resolve to welcome page even if session is already expired.
@@ -123,6 +79,9 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:admin'])
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/applications', [AdminDashboardController::class, 'applications'])->name('applications.index');
         Route::get('/monitoring', [AdminDashboardController::class, 'monitoring'])->name('monitoring');
+        Route::get('/monitoring/hardcopy/create', [AdminDashboardController::class, 'createOfflineEnrollment'])->name('monitoring.hardcopy.create');
+        Route::post('/monitoring/hardcopy', [AdminDashboardController::class, 'storeOfflineEnrollment'])->name('monitoring.hardcopy.store');
+        Route::get('/enrolled-students', [AdminDashboardController::class, 'enrolledStudents'])->name('enrolled-students');
         Route::get('/monitoring/{application}', [AdminDashboardController::class, 'showMonitoringApplication'])->name('monitoring.show');
         Route::post('/applications/{application}/review', [ReviewController::class, 'review'])->name('applications.review');
         Route::resource('announcements', AnnouncementController::class)->except(['show']);
@@ -134,6 +93,8 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:super_admin'
     ->group(function () {
         Route::get('/', [MasterDashboardController::class, 'index'])->name('dashboard');
         Route::get('/monitoring', [MasterDashboardController::class, 'monitoring'])->name('monitoring');
+        Route::get('/enrollment-history', [MasterDashboardController::class, 'enrollmentHistory'])->name('enrollment-history');
+        Route::get('/enrolled-students', [MasterDashboardController::class, 'enrolledStudents'])->name('enrolled-students');
         Route::get('/monitoring/{application}', [MasterDashboardController::class, 'showMonitoringApplication'])->name('monitoring.show');
         Route::post('/monitoring/{application}/unlock-edit', [MasterDashboardController::class, 'unlockMonitoringEdit'])->name('monitoring.unlock-edit');
         Route::put('/monitoring/{application}', [MasterDashboardController::class, 'updateMonitoringApplication'])->name('monitoring.update');
@@ -141,8 +102,12 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:super_admin'
         Route::get('/school-years', [MasterDashboardController::class, 'schoolYears'])->name('school-years.index');
         Route::get('/backup', [MasterDashboardController::class, 'backup'])->name('backup.index');
         Route::post('/applications/{application}/decision', [DecisionController::class, 'decide'])->name('applications.decide');
+        Route::delete('/enrollees/{application}/duplicate', [MasterDashboardController::class, 'destroyDuplicateEnrollee'])->name('enrollees.destroy-duplicate');
         Route::post('/school-years/{schoolYear}/toggle-enrollment', [MasterDashboardController::class, 'toggleEnrollment'])->name('school-years.toggle');
         Route::post('/school-years/{schoolYear}/set-active', [MasterDashboardController::class, 'setActive'])->name('school-years.set-active');
+        Route::post('/school-years', [MasterDashboardController::class, 'storeSchoolYear'])->name('school-years.store');
+        Route::post('/school-years/{schoolYear}/lock', [MasterDashboardController::class, 'lockSchoolYear'])->name('school-years.lock');
+        Route::put('/school-years/{schoolYear}/enrollment-window', [MasterDashboardController::class, 'updateEnrollmentWindow'])->name('school-years.enrollment-window');
         Route::resource('announcements', AnnouncementController::class)->except(['show']);
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export/csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
@@ -152,4 +117,7 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:super_admin'
         Route::post('/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings/password', [SettingsController::class, 'updateOwnPassword'])->name('settings.password.update');
+        Route::post('/settings/force-password-change/{user}', [SettingsController::class, 'forcePasswordChange'])->name('settings.force-password-change');
+        Route::post('/settings/users/{user}/password', [SettingsController::class, 'setManagedUserPassword'])->name('settings.user-password.set');
     });

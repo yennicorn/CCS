@@ -2,13 +2,18 @@
     $application = $application ?? null;
     $readonly = $readonly ?? false;
     $disabled = $readonly ? 'disabled' : '';
-    $gradeLevels = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
+    $gradeLevels = ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
     $selectedDisabilities = old('disability_types', $application->disability_types ?? []);
     if (!is_array($selectedDisabilities)) {
         $selectedDisabilities = [];
     }
 @endphp
 
+<div class="enrollment-instruction-line">
+    <strong>INSTRUCTIONS:</strong> Print legibly all information required in <strong>CAPITAL</strong> letters. Submit accomplished form to the school.
+</div>
+
+<div class="enrollment-form-body">
 <div class="enrollment-form-grid enrollment-form-two">
     <div>
         <label>Grade Level</label>
@@ -184,4 +189,5 @@
     <div><label>First Name</label><input type="text" name="guardian_first_name" value="{{ old('guardian_first_name', $application->guardian_first_name ?? '') }}" {{ $disabled }}></div>
     <div><label>Middle Name</label><input type="text" name="guardian_middle_name" value="{{ old('guardian_middle_name', $application->guardian_middle_name ?? '') }}" {{ $disabled }}></div>
     <div><label>Contact Number</label><input type="text" name="guardian_contact_number" value="{{ old('guardian_contact_number', $application->guardian_contact_number ?? '') }}" {{ $disabled }}></div>
+</div>
 </div>
