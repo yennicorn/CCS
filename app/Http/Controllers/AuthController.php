@@ -73,6 +73,9 @@ class AuthController extends Controller
             return redirect()->route('login')->withErrors(['email' => 'Your account has been deactivated.']);
         }
 
+        // Ensure first redirect after a successful login always reaches the role landing page.
+        $request->session()->put('allow_role_landing_once', true);
+
         return $this->redirectByRole($user->role);
     }
 

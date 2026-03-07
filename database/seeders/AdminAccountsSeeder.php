@@ -27,7 +27,7 @@ class AdminAccountsSeeder extends Seeder
             [
                 'full_name' => 'School Administrator',
                 'username' => 'adminuser',
-                'password' => Hash::make('AdminUser2026'),
+                'password' => Hash::make('Admin2026'),
                 'role' => 'admin',
                 'is_active' => true,
                 'force_password_change' => true,

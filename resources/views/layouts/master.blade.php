@@ -8,7 +8,11 @@
 </head>
 <body>
 <div class="app-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="adminSidebar">
+        <div class="sidebar-mobile-head">
+            <strong>Navigation</strong>
+            <button type="button" class="sidebar-close" data-sidebar-close aria-label="Close navigation">Close</button>
+        </div>
         <div class="sidebar-brand">
             <img src="{{ asset('images/branding/CCS_logo.png') }}" alt="School logo">
             <div>
@@ -31,10 +35,19 @@
             </form>
         </div>
     </aside>
+    <button type="button" class="sidebar-backdrop" data-sidebar-close aria-label="Close navigation"></button>
 
     <div class="main-area">
         <header class="topbar">
             <div class="topbar-inner">
+                <button type="button" class="sidebar-toggle" data-sidebar-open aria-label="Open navigation">
+                    <span class="sidebar-toggle__icon" aria-hidden="true">
+                        <span class="sidebar-toggle__bar"></span>
+                        <span class="sidebar-toggle__bar"></span>
+                        <span class="sidebar-toggle__bar"></span>
+                    </span>
+                    <span class="sidebar-toggle__label">Menu</span>
+                </button>
                 <div>
                     <h1 class="page-title">@yield('page_title', 'Dashboard')</h1>
                     <p class="muted">@yield('page_subtitle', 'Cabugbugan Community School Management Portal')</p>
@@ -68,61 +81,114 @@
 </div>
 <script>
 (() => {
+    const body = document.body;
+    const sidebar = document.getElementById('adminSidebar');
+    const sidebarOpenButtons = document.querySelectorAll('[data-sidebar-open]');
+    const sidebarCloseButtons = document.querySelectorAll('[data-sidebar-close]');
+    const mobileSidebarQuery = window.matchMedia('(max-width: 1000px)');
     const modal = document.getElementById('logoutConfirmModal');
     const confirmButton = document.getElementById('logoutConfirmBtn');
 
-    if (!modal || !confirmButton) {
-        return;
+    const closeSidebar = () => {
+        body.classList.remove('sidebar-open');
+    };
+
+    const openSidebar = () => {
+        if (!mobileSidebarQuery.matches) {
+            return;
+        }
+        body.classList.add('sidebar-open');
+    };
+
+    sidebarOpenButtons.forEach((button) => {
+        button.addEventListener('click', openSidebar);
+    });
+
+    sidebarCloseButtons.forEach((button) => {
+        button.addEventListener('click', closeSidebar);
+    });
+
+    if (sidebar) {
+        sidebar.querySelectorAll('a.sidebar-link').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (mobileSidebarQuery.matches) {
+                    closeSidebar();
+                }
+            });
+        });
     }
 
-    const dismissButtons = modal.querySelectorAll('[data-dismiss-logout]');
-    const logoutForms = document.querySelectorAll('.js-logout-form');
-    let pendingForm = null;
+    mobileSidebarQuery.addEventListener('change', () => {
+        if (!mobileSidebarQuery.matches) {
+            closeSidebar();
+        }
+    });
 
-    const openModal = (form) => {
-        pendingForm = form;
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
-        confirmButton.focus();
-    };
+    if (modal && confirmButton) {
+        const dismissButtons = modal.querySelectorAll('[data-dismiss-logout]');
+        const logoutForms = document.querySelectorAll('.js-logout-form');
+        let pendingForm = null;
 
-    const closeModal = () => {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-open');
-        pendingForm = null;
-    };
+        const openModal = (form) => {
+            pendingForm = form;
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            confirmButton.focus();
+        };
 
-    logoutForms.forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            if (form.dataset.skipConfirm === '1') {
+        const closeModal = () => {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+            pendingForm = null;
+        };
+
+        logoutForms.forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                if (form.dataset.skipConfirm === '1') {
+                    return;
+                }
+
+                event.preventDefault();
+                openModal(form);
+            });
+        });
+
+        confirmButton.addEventListener('click', () => {
+            if (!pendingForm) {
                 return;
             }
 
-            event.preventDefault();
-            openModal(form);
+            pendingForm.dataset.skipConfirm = '1';
+            pendingForm.submit();
         });
-    });
 
-    confirmButton.addEventListener('click', () => {
-        if (!pendingForm) {
-            return;
-        }
+        dismissButtons.forEach((button) => {
+            button.addEventListener('click', closeModal);
+        });
 
-        pendingForm.dataset.skipConfirm = '1';
-        pendingForm.submit();
-    });
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') {
+                return;
+            }
 
-    dismissButtons.forEach((button) => {
-        button.addEventListener('click', closeModal);
-    });
+            if (modal.classList.contains('is-open')) {
+                closeModal();
+                return;
+            }
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
-            closeModal();
-        }
-    });
+            if (body.classList.contains('sidebar-open')) {
+                closeSidebar();
+            }
+        });
+    } else {
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && body.classList.contains('sidebar-open')) {
+                closeSidebar();
+            }
+        });
+    }
 })();
 </script>
 </body>

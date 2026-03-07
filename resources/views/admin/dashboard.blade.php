@@ -22,9 +22,6 @@
         <h2>Analytics Overview</h2>
         <p class="muted">Dashboard view for enrollment statistics and chart insights.</p>
     </div>
-    <div class="dash-search">
-        <input type="text" placeholder="Search analytics by grade or gender..." disabled>
-    </div>
     <div class="dash-head-right">
         <a class="notif notif-link" href="{{ route('admin.monitoring') }}" title="Pending applications to review">
             <x-icon name="bell" />

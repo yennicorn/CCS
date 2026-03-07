@@ -43,7 +43,6 @@
 <section class="panel">
     <div class="panel-head">
         <h3><span class="icon-inline"><x-icon name="document" /> New Learner Enrollment Form</span></h3>
-        <p class="muted">Parents can submit more than one learner application.</p>
     </div>
 
     @if($activeSchoolYear && ($isEnrollmentOpen ?? false))

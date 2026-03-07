@@ -4,8 +4,6 @@
 @section('page_subtitle', 'Operational Review and Monitoring')
 
 @section('sidebar')
-<div class="role-chip">Role: ADMIN</div>
-
 <a class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
     <span class="nav-ico"><x-icon name="dashboard" /></span> Dashboard
 </a>

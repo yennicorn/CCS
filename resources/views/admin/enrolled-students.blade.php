@@ -45,6 +45,17 @@
             </a>
         @endforeach
     </nav>
+    <form method="GET" action="{{ route('admin.enrolled-students') }}" class="grade-mobile-select">
+        @if(!empty($nameFilter))
+            <input type="hidden" name="name" value="{{ $nameFilter }}">
+        @endif
+        <label for="admin_enrolled_grade_mobile">Quick Grade Jump</label>
+        <select id="admin_enrolled_grade_mobile" name="grade" onchange="this.form.submit()">
+            @foreach(($gradeLevels ?? []) as $grade)
+                <option value="{{ $grade }}" {{ ($selectedGrade ?? '') === $grade ? 'selected' : '' }}>{{ $grade }}</option>
+            @endforeach
+        </select>
+    </form>
 </section>
 
 @foreach($enrolledByGrade as $grade => $group)

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ApplicationStatusReasoner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -87,4 +88,40 @@ class Application extends Model
     public function schoolYear() { return $this->belongsTo(SchoolYear::class); }
     public function documents() { return $this->hasMany(Document::class); }
     public function statusLogs() { return $this->hasMany(ApplicationStatusLog::class); }
+
+    /**
+     * @return array<int, string>
+     */
+    public function allowedNextStatuses(): array
+    {
+        return ApplicationStatusReasoner::allowedNextStatuses((string) $this->status);
+    }
+
+    public function canTransitionTo(string $nextStatus): bool
+    {
+        return ApplicationStatusReasoner::canTransition((string) $this->status, $nextStatus);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function allowedFinalDecisionStatuses(): array
+    {
+        return ApplicationStatusReasoner::allowedFinalDecisionStatuses((string) $this->status);
+    }
+
+    public function canReceiveFinalDecision(): bool
+    {
+        return $this->allowedFinalDecisionStatuses() !== [];
+    }
+
+    public function canBeReviewedByAdmin(): bool
+    {
+        return ApplicationStatusReasoner::canBeReviewedByAdmin((string) $this->status);
+    }
+
+    public function canBeEditedByApplicant(): bool
+    {
+        return ApplicationStatusReasoner::canBeEditedByApplicant((string) $this->status);
+    }
 }

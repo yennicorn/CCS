@@ -1,7 +1,7 @@
 @extends('layouts.enduser')
 
 @section('page_title', 'Information Feed')
-@section('page_subtitle', 'School announcements and official updates for parents and students.')
+@section('page_subtitle', 'School announcements and official updates.')
 
 @section('content')
 <section class="panel">

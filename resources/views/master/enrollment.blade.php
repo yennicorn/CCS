@@ -34,8 +34,13 @@
                         <div class="action-row">
                             <form method="POST" action="{{ route('master.applications.decide', $app) }}">
                                 @csrf
-                                <input type="hidden" name="status" value="approved">
-                                <button class="btn" type="submit"> Approve</button>
+                                <select name="status" required>
+                                    @foreach($app->allowedFinalDecisionStatuses() as $nextStatus)
+                                        <option value="{{ $nextStatus }}">{{ strtoupper($nextStatus) }}</option>
+                                    @endforeach
+                                </select>
+                                <input type="text" name="remarks" placeholder="Remarks (required for reject/waitlist)">
+                                <button class="btn" type="submit">Submit Decision</button>
                             </form>
                         </div>
                     </td>

@@ -27,7 +27,7 @@
     </article>
 </section>
 
-@if($application->status === 'pending')
+@if($application->canBeReviewedByAdmin())
     <section class="panel print-hide">
         <div class="panel-head">
             <h3>Review Action</h3>

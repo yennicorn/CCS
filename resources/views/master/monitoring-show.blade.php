@@ -25,7 +25,6 @@
         <div class="alert alert-success mt-10">Edit mode unlocked for this form. Save your updates below.</div>
     @endif
 </section>
-No, the inputs will appear, just follow the alignment and the structure of the form to be fit in a one A4 bonpaper to avoid being cut and using another bondpaper
 <section class="enrollment-paper-wrap">
     <article class="enrollment-paper">
         @include('enduser.partials.enrollment-paper-head', [

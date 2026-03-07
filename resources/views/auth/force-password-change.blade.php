@@ -6,41 +6,104 @@
 <title>Update Password</title>
 <link rel="stylesheet" href="{{ asset('css/ccs-ui.css') }}">
 </head>
-<body>
-<div class="auth-portal">
-    <section class="auth-left">
-        <div class="auth-brand">
-            <div class="auth-seal">
-                <img src="{{ asset('images/branding/CCS_logo.png') }}" alt="School seal logo">
-            </div>
-            <h1> Password Update</h1>
-            <p>For security, your account requires a fresh password before continuing.</p>
+<body class="welcome-page auth-welcome-page">
+<div class="welcome-layout">
+    <header class="welcome-system-brand">
+        <img src="{{ asset('images/branding/CCS_logo.png') }}" alt="Cabugbugan Community School logo">
+        <div class="welcome-system-text">
+            <strong>Cabugbugan Community School</strong>
+            <span>Information and Online Enrollment System</span>
         </div>
-    </section>
+    </header>
 
-    <section class="auth-right">
-        <div class="auth-shell-card auth-compact">
-            <div class="auth-shell-head">
-                <h2> Password Update Required</h2>
-                <p>Please set a new secure password to continue.</p>
-            </div>
+    <main class="welcome-card auth-welcome-card">
+        <span class="welcome-particle p1" aria-hidden="true"></span>
+        <span class="welcome-particle p4" aria-hidden="true"></span>
+        <span class="welcome-particle p5" aria-hidden="true"></span>
 
-            @if($errors->any())
-                <div class="alert alert-error">{{ $errors->first() }}</div>
-            @endif
+        <div class="welcome-card-content auth-welcome-content">
+            <section class="auth-welcome-message">
+                <p class="welcome-kicker">Password Update</p>
+                <h1>Set a fresh password to secure your account.</h1>
+                <p class="auth-welcome-copy">For security, your account requires a password update before you can continue.</p>
 
-            <form method="POST" action="{{ route('password.change.update') }}">
-                @csrf
-                <label>New Password</label>
-                <input type="password" name="password" required>
+                <div class="auth-brand-seal">
+                    <img src="{{ asset('images/branding/CCS_logo.png') }}" alt="School seal logo">
+                </div>
+            </section>
 
-                <label>Confirm Password</label>
-                <input type="password" name="password_confirmation" required>
+            <section class="auth-shell-card auth-shell-card--welcome auth-shell-card--update">
+                <div class="auth-shell-head">
+                    <span class="auth-chip">Security Check</span>
+                    <h2>Password Update Required</h2>
+                    <p>Please set a new secure password to continue.</p>
+                </div>
 
-                <button class="btn btn-auth mt-12" type="submit"> Update Password</button>
-            </form>
+                @if($errors->any())
+                    <div class="alert alert-error">{{ $errors->first() }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('password.change.update') }}">
+                    @csrf
+                    <label>New Password</label>
+                    <div class="auth-password-wrap">
+                        <input id="force_password" class="auth-password-input" type="password" name="password" placeholder="Create a new password" autocomplete="new-password" required>
+                        <button type="button" class="auth-password-toggle" data-toggle-password="force_password" aria-label="Show password" aria-pressed="false">
+                            <svg class="eye eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
+                                <circle cx="12" cy="12" r="3.2"></circle>
+                            </svg>
+                            <svg class="eye eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M3 3l18 18"></path>
+                                <path d="M10.6 6.3A11.3 11.3 0 0 1 12 6c6.5 0 10 6 10 6a17.5 17.5 0 0 1-3.4 4.1"></path>
+                                <path d="M6.1 6.1A17.8 17.8 0 0 0 2 12s3.5 6 10 6c1.6 0 3-.3 4.2-.9"></path>
+                                <path d="M9.9 9.9a3.2 3.2 0 0 0 4.2 4.2"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <label>Confirm Password</label>
+                    <div class="auth-password-wrap">
+                        <input id="force_password_confirmation" class="auth-password-input" type="password" name="password_confirmation" placeholder="Confirm new password" autocomplete="new-password" required>
+                        <button type="button" class="auth-password-toggle" data-toggle-password="force_password_confirmation" aria-label="Show password" aria-pressed="false">
+                            <svg class="eye eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
+                                <circle cx="12" cy="12" r="3.2"></circle>
+                            </svg>
+                            <svg class="eye eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M3 3l18 18"></path>
+                                <path d="M10.6 6.3A11.3 11.3 0 0 1 12 6c6.5 0 10 6 10 6a17.5 17.5 0 0 1-3.4 4.1"></path>
+                                <path d="M6.1 6.1A17.8 17.8 0 0 0 2 12s3.5 6 10 6c1.6 0 3-.3 4.2-.9"></path>
+                                <path d="M9.9 9.9a3.2 3.2 0 0 0 4.2 4.2"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-auth mt-12" type="submit">Update Password</button>
+                </form>
+            </section>
         </div>
-    </section>
+
+        <footer class="welcome-card-footer">
+            <span>&copy; {{ now()->year }} Cabugbugan Community School. Tagudin District, Ilocos Sur.</span>
+        </footer>
+    </main>
 </div>
+<script>
+document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const id = button.getAttribute('data-toggle-password');
+        const input = id ? document.getElementById(id) : null;
+        if (!input) {
+            return;
+        }
+
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        button.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+});
+</script>
 </body>
 </html>

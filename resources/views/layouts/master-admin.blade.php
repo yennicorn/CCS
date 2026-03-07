@@ -4,8 +4,6 @@
 @section('page_subtitle', 'School Enrollment Governance and Decision Management')
 
 @section('sidebar')
-<div class="role-chip">Role: SUPER ADMIN</div>
-
 <a class="sidebar-link {{ request()->routeIs('master.dashboard') ? 'active' : '' }}" href="{{ route('master.dashboard') }}">
     <span class="nav-ico"><x-icon name="dashboard" /></span> Dashboard
 </a>

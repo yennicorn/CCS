@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\ApplicationStatusLog;
 use App\Models\Document;
 use App\Models\SchoolYear;
+use App\Support\ApplicationStatusReasoner;
 use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 
@@ -93,8 +94,10 @@ class ApplicationController extends Controller
         abort_unless(in_array($request->user()->role, ['parent', 'student'], true), 403);
         abort_if($application->user_id !== auth()->id(), 403);
 
-        if ($application->status !== 'pending') {
-            return back()->withErrors(['application' => 'Editing is allowed only while status is pending.']);
+        if (!$application->canBeEditedByApplicant()) {
+            return back()->withErrors([
+                'application' => 'Editing is allowed only while your application is still in '.ApplicationStatusReasoner::PENDING.' status.',
+            ]);
         }
 
         $validated = $request->validate($this->rules());
