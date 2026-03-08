@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cabugbugan Community School</title>
+<link rel="icon" type="image/png" href="{{ asset('images/branding/CCS_logo.png') }}">
 <link rel="stylesheet" href="{{ asset('css/ccs-ui.css') }}">
 </head>
 <body class="welcome-page">
@@ -47,4 +48,3 @@
 </div>
 </body>
 </html>
-
