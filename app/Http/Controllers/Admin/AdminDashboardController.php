@@ -32,12 +32,52 @@ class AdminDashboardController extends Controller
 
     public function index()
     {
+        $byGrade = array_fill_keys(self::GRADE_LEVELS, 0);
+        foreach (Application::query()
+            ->selectRaw('grade_level, COUNT(*) as total')
+            ->whereIn('grade_level', self::GRADE_LEVELS)
+            ->groupBy('grade_level')
+            ->pluck('total', 'grade_level')
+            ->all() as $grade => $total) {
+            $byGrade[(string) $grade] = (int) $total;
+        }
+
+        $byGradeGender = [];
+        foreach (self::GRADE_LEVELS as $grade) {
+            $byGradeGender[$grade] = ['male' => 0, 'female' => 0];
+        }
+
+        foreach (Application::query()
+            ->selectRaw("grade_level, COALESCE(NULLIF(gender, ''), 'unspecified') as gender, COUNT(*) as total")
+            ->whereIn('grade_level', self::GRADE_LEVELS)
+            ->groupBy('grade_level', 'gender')
+            ->get()
+            ->all() as $row) {
+            $grade = (string) $row->grade_level;
+            $gender = (string) $row->gender;
+            $total = (int) $row->total;
+
+            if (!isset($byGradeGender[$grade])) {
+                continue;
+            }
+
+            if ($gender === 'male') {
+                $byGradeGender[$grade]['male'] += $total;
+                continue;
+            }
+
+            if ($gender === 'female') {
+                $byGradeGender[$grade]['female'] += $total;
+            }
+        }
+
         $stats = [
             'total' => Application::count(),
             'pending' => Application::where('status', 'pending')->count(),
             'reviewed' => Application::where('status', 'reviewed')->count(),
             'approved' => Application::where('status', 'approved')->count(),
-            'by_grade' => Application::selectRaw('grade_level, COUNT(*) as total')->groupBy('grade_level')->pluck('total', 'grade_level'),
+            'by_grade' => $byGrade,
+            'by_grade_gender' => $byGradeGender,
         ];
 
         $genderStats = Application::selectRaw("COALESCE(NULLIF(gender, ''), 'unspecified') as gender, COUNT(*) as total")
@@ -72,12 +112,22 @@ class AdminDashboardController extends Controller
     {
         $nameFilter = $this->normalizeFilterInput((string) $request->input('name', ''));
         $selectedGrade = $this->resolveSelectedGrade((string) $request->input('grade', ''));
+        $selectedStatus = (string) $request->input('status', 'all');
+        if (!in_array($selectedStatus, ['all', 'pending', 'reviewed'], true)) {
+            $selectedStatus = 'all';
+        }
         $hasFilter = $nameFilter !== '';
+        $statusForcesAllGrades = in_array($selectedStatus, ['pending', 'reviewed'], true);
+        $showAllGrades = $hasFilter || $statusForcesAllGrades;
 
         $applicationsQuery = Application::query()
             ->whereIn('grade_level', self::GRADE_LEVELS);
 
-        if (!$hasFilter) {
+        if ($selectedStatus !== 'all') {
+            $applicationsQuery->where('status', $selectedStatus);
+        }
+
+        if (!$showAllGrades) {
             $applicationsQuery->where('grade_level', $selectedGrade);
         }
 
@@ -90,22 +140,22 @@ class AdminDashboardController extends Controller
             ->latest('created_at')
             ->get();
 
-        $visibleGrades = $hasFilter ? self::GRADE_LEVELS : [$selectedGrade];
+        $visibleGrades = $showAllGrades ? self::GRADE_LEVELS : [$selectedGrade];
         $applicationsByGrade = collect($visibleGrades)
             ->mapWithKeys(fn ($grade) => [$grade => $applications->where('grade_level', $grade)->values()]);
 
-        if ($hasFilter) {
+        if ($showAllGrades) {
             $applicationsByGrade = $applicationsByGrade->filter(fn ($items) => $items->isNotEmpty());
         }
 
-        if ($hasFilter && $applicationsByGrade->isNotEmpty() && !$applicationsByGrade->has($selectedGrade)) {
+        if ($showAllGrades && $applicationsByGrade->isNotEmpty() && !$applicationsByGrade->has($selectedGrade)) {
             $selectedGrade = (string) $applicationsByGrade->keys()->first();
         }
 
         $matchedCount = $applications->count();
         $gradeLevels = self::GRADE_LEVELS;
 
-        return view('admin.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels'));
+        return view('admin.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'selectedStatus', 'showAllGrades'));
     }
 
     public function showMonitoringApplication(Application $application)

@@ -37,19 +37,59 @@ class MasterDashboardController extends Controller
 
     public function index()
     {
+        $byGrade = array_fill_keys(self::GRADE_LEVELS, 0);
+        foreach (Application::query()
+            ->selectRaw('grade_level, COUNT(*) as total')
+            ->whereIn('grade_level', self::GRADE_LEVELS)
+            ->groupBy('grade_level')
+            ->pluck('total', 'grade_level')
+            ->all() as $grade => $total) {
+            $byGrade[(string) $grade] = (int) $total;
+        }
+
+        $byGradeGender = [];
+        foreach (self::GRADE_LEVELS as $grade) {
+            $byGradeGender[$grade] = ['male' => 0, 'female' => 0];
+        }
+
+        foreach (Application::query()
+            ->selectRaw("grade_level, COALESCE(NULLIF(gender, ''), 'unspecified') as gender, COUNT(*) as total")
+            ->whereIn('grade_level', self::GRADE_LEVELS)
+            ->groupBy('grade_level', 'gender')
+            ->get()
+            ->all() as $row) {
+            $grade = (string) $row->grade_level;
+            $gender = (string) $row->gender;
+            $total = (int) $row->total;
+
+            if (!isset($byGradeGender[$grade])) {
+                continue;
+            }
+
+            if ($gender === 'male') {
+                $byGradeGender[$grade]['male'] += $total;
+                continue;
+            }
+
+            if ($gender === 'female') {
+                $byGradeGender[$grade]['female'] += $total;
+            }
+        }
+
         $stats = [
             'total' => Application::count(),
-            'pending' => Application::where('status', 'pending')->count(),
+            'pending' => Application::whereIn('status', ['pending', 'reviewed'])->count(),
             'reviewed' => Application::where('status', 'reviewed')->count(),
             'approved' => Application::where('status', 'approved')->count(),
-            'by_grade' => Application::selectRaw('grade_level, COUNT(*) as total')->groupBy('grade_level')->pluck('total', 'grade_level'),
+            'by_grade' => $byGrade,
+            'by_grade_gender' => $byGradeGender,
         ];
 
         $genderStats = Application::selectRaw("COALESCE(NULLIF(gender, ''), 'unspecified') as gender, COUNT(*) as total")
             ->groupBy('gender')
             ->pluck('total', 'gender');
 
-        $notificationCount = (int) $stats['reviewed'];
+        $notificationCount = (int) $stats['pending'];
 
         return view('master.dashboard', compact('stats', 'genderStats', 'notificationCount'));
     }

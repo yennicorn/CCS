@@ -20,9 +20,39 @@ class HomepageController extends Controller
             $q->whereNull('publish_at')->orWhere('publish_at', '<=', now());
         })->latest('publish_at')->latest('created_at')->get();
 
-        $application = Application::where('user_id', auth()->id())->latest()->first();
+        $application = Application::with('schoolYear')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->first();
 
-        return view('enduser.feed', compact('announcements', 'application'));
+        $activeSchoolYears = SchoolYear::where('is_active', true)->get();
+        $activeSchoolYear = $activeSchoolYears->count() === 1 ? $activeSchoolYears->first() : null;
+        $currentSchoolYearLabel = $activeSchoolYear?->name
+            ?? $activeSchoolYear?->year
+            ?? $application?->schoolYear?->name
+            ?? $application?->schoolYear?->year
+            ?? 'CURRENT SCHOOL YEAR';
+
+        $enrolledApplicationsQuery = Application::query()
+            ->where('user_id', auth()->id())
+            ->where('status', 'approved');
+
+        if ($activeSchoolYear) {
+            $enrolledApplicationsQuery->where('school_year_id', $activeSchoolYear->id);
+        }
+
+        $enrolledLearnerNames = $enrolledApplicationsQuery
+            ->pluck('learner_full_name')
+            ->filter()
+            ->map(fn ($name) => trim((string) $name))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $enrolledCount = $enrolledLearnerNames->count();
+        $enrolledLearnerNamesText = $enrolledLearnerNames->implode(', ');
+
+        return view('enduser.feed', compact('announcements', 'application', 'currentSchoolYearLabel', 'enrolledCount', 'enrolledLearnerNamesText'));
     }
 
     public function enrollment()

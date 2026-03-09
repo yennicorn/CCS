@@ -27,7 +27,7 @@
         <div class="enduser-status-strip">
             <div>
                 <p class="muted">Latest Application Status</p>
-                <span class="badge {{ $latestApplication->status }}">{{ strtoupper($latestApplication->status) }}</span>
+                <span class="badge {{ $latestApplication->status }}">{{ \App\Support\StatusLabel::for($latestApplication->status) }}</span>
             </div>
             <div>
                 <p class="muted">Latest Submitted</p>
@@ -87,7 +87,7 @@
                 <tr>
                     <td data-label="Learner">{{ $entry->learner_full_name }}</td>
                     <td data-label="Submitted">{{ optional($entry->submitted_at)->format('M d, Y h:i A') ?? '-' }}</td>
-                    <td data-label="Status"><span class="badge {{ $entry->status }}">{{ strtoupper($entry->status) }}</span></td>
+                    <td data-label="Status"><span class="badge {{ $entry->status }}">{{ \App\Support\StatusLabel::for($entry->status) }}</span></td>
                     <td data-label="Grade Level">{{ $entry->grade_level }}</td>
                     <td data-label="Action"><a class="btn btn-secondary" href="{{ route('applications.show', $entry) }}">Open Timeline</a></td>
                 </tr>

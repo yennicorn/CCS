@@ -46,7 +46,7 @@
                     <label>Parent or a Student?</label>
                     <select name="role" required>
                         <option value="">Select one</option>
-                        <option value="parent" {{ old('role')==='parent'?'selected':'' }}>Parent</option>
+                        <option value="parent" {{ old('role')==='parent'?'selected':'' }}>Parent/Guardian</option>
                         <option value="student" {{ old('role')==='student'?'selected':'' }}>Student</option>
                     </select>
                     <p class="auth-help">Choose the role that matches your account type.</p>

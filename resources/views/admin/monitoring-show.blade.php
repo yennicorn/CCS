@@ -7,7 +7,7 @@
 <section class="panel print-hide">
     <div class="panel-head">
         <h3>Application #{{ $application->id }}</h3>
-        <p class="muted">Status: <span class="badge {{ $application->status }}">{{ strtoupper($application->status) }}</span></p>
+        <p class="muted">Status: <span class="badge {{ $application->status }}">{{ \App\Support\StatusLabel::for($application->status) }}</span></p>
     </div>
     <div class="action-row">
         <a class="btn btn-secondary" href="{{ route('admin.monitoring') }}">Return</a>

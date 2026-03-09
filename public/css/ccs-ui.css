@@ -452,6 +452,55 @@ p { margin: 0 0 10px; }
     justify-content: flex-end;
 }
 
+.enrollment-status-panel .panel-head {
+    border-bottom-color: #bcd3e7;
+}
+
+.enrollment-status-card {
+    grid-template-columns: 1fr auto;
+    padding: 14px;
+    border-color: #b8d2e7;
+    background:
+        radial-gradient(circle at 8% 0, rgba(91, 159, 217, .12) 0%, rgba(91,159,217,0) 34%),
+        linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
+}
+
+.enrollment-status-main {
+    display: grid;
+    gap: 5px;
+    align-content: start;
+}
+
+.enrollment-status-label {
+    margin: 0;
+    letter-spacing: .2px;
+}
+
+.enrollment-status-message {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.35;
+    color: #0f3e69;
+}
+
+.enrollment-status-meta {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1b5789;
+    border: 1px solid #c1d8eb;
+    border-radius: 999px;
+    background: #f3f9ff;
+    padding: 3px 10px;
+}
+
+.enrollment-status-panel .enduser-status-cta .btn {
+    min-height: 42px;
+    padding: 10px 16px;
+}
+
 .table-wrap--stack {
     overflow: visible;
 }
@@ -1876,6 +1925,20 @@ tr:nth-child(even) td { background: #fbfdff; }
         width: 100%;
     }
 
+    .enrollment-status-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .enrollment-status-message {
+        font-size: 21px;
+    }
+
+    .enrollment-status-panel .panel-head .btn {
+        width: 100%;
+    }
+
     .panel-head .btn {
         width: 100%;
     }
@@ -2673,10 +2736,54 @@ tr:nth-child(even) td { background: #fbfdff; }
 }
 
 .grade-bar-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    cursor: default;
+}
+
+.grade-bar-item::before,
+.grade-bar-item::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s ease, transform .16s ease;
+}
+
+.grade-bar-item::after {
+    content: attr(data-tooltip);
+    left: 50%;
+    bottom: calc(100% + 10px);
+    transform: translate(-50%, 6px);
+    font-size: 12px;
+    font-weight: 700;
+    color: #f7fbff;
+    background: rgba(10, 43, 72, .94);
+    border: 1px solid rgba(154, 192, 223, .35);
+    border-radius: 8px;
+    padding: 5px 8px;
+    white-space: nowrap;
+    box-shadow: 0 8px 16px rgba(9, 35, 59, .22);
+    z-index: 5;
+}
+
+.grade-bar-item::before {
+    content: "";
+    left: 50%;
+    bottom: calc(100% + 4px);
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(10, 43, 72, .94);
+    z-index: 4;
+}
+
+.grade-bar-item:hover::before,
+.grade-bar-item:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
 .grade-bar-value {

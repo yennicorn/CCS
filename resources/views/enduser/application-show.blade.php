@@ -7,7 +7,7 @@
 <section class="panel">
     <div class="panel-head">
         <h2><span class="icon-inline"><x-icon name="timeline" /> Application Status Timeline</span></h2>
-        <span class="badge {{ $application->status }}">{{ strtoupper($application->status) }}</span>
+        <span class="badge {{ $application->status }}">{{ \App\Support\StatusLabel::for($application->status) }}</span>
     </div>
 
     <p class="mt-10"><a class="btn btn-secondary" href="{{ route('homepage.enrollment') }}">Back to Enrollment</a></p>
@@ -41,7 +41,7 @@
             @forelse($application->statusLogs()->orderBy('changed_at')->get() as $log)
                 <tr>
                     <td data-label="Date">{{ optional($log->changed_at)->timezone(config('app.timezone'))->format('M d, Y h:i A') ?? '-' }}</td>
-                    <td data-label="Status"><span class="badge {{ $log->status }}">{{ strtoupper($log->status) }}</span></td>
+                    <td data-label="Status"><span class="badge {{ $log->status }}">{{ \App\Support\StatusLabel::for($log->status) }}</span></td>
                     <td data-label="Remarks">{{ $log->remarks ?: '-' }}</td>
                     <td data-label="Changed By">{{ optional($log->changedBy)->full_name ?? 'System' }}</td>
                 </tr>

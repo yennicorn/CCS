@@ -4,27 +4,38 @@
 @section('page_subtitle', 'School announcements and official updates.')
 
 @section('content')
+@if($application)
+    <section class="panel enrollment-status-panel">
+        <div class="panel-head">
+            <h2><span class="icon-inline"><x-icon name="timeline" /> Enrollment Status</span></h2>
+        </div>
+        @php $accountRole = auth()->user()->role ?? null; @endphp
+        <div class="enduser-status-strip enrollment-status-card">
+            <div class="enrollment-status-main">
+                <p class="muted enrollment-status-label">Your Current Enrollment Status</p>
+                @if(($enrolledCount ?? 0) > 0)
+                    @if($accountRole === 'parent')
+                        <strong class="enrollment-status-message">
+                            Congaratulations! Enrollment confirmed for S.Y. {{ $currentSchoolYearLabel ?? 'CURRENT SCHOOL YEAR' }}:
+                            {{ $enrolledLearnerNamesText ?: 'your child/children' }}.
+                        </strong>
+                    @elseif($accountRole === 'student')
+                        <strong class="enrollment-status-message">Congratulations! You are now enrolled for S.Y. {{ $currentSchoolYearLabel ?? 'CURRENT SCHOOL YEAR' }}.</strong>
+                    @else
+                        <strong class="enrollment-status-message">Congratulations! You are now enrolled for S.Y. {{ $currentSchoolYearLabel ?? 'CURRENT SCHOOL YEAR' }}.</strong>
+                    @endif
+                @else
+                    <span class="badge {{ $application->status }}">{{ \App\Support\StatusLabel::for($application->status) }}</span>
+                @endif
+            </div>
+        </div>
+    </section>
+@endif
+
 <section class="panel">
     <div class="panel-head">
         <h2><span class="icon-inline"><x-icon name="announcements" /> Announcement Feed</span></h2>
-        @if($application)
-            <a class="btn btn-secondary" href="{{ route('homepage.enrollment') }}">
-                <x-icon name="timeline" /> Track Enrollment Status
-            </a>
-        @endif
     </div>
-
-    @if($application)
-        <div class="enduser-status-strip">
-            <div>
-                <p class="muted">Your Current Enrollment Status</p>
-                <span class="badge {{ $application->status }}">{{ strtoupper($application->status) }}</span>
-            </div>
-            <div class="enduser-status-cta">
-                <a class="btn" href="{{ route('homepage.enrollment') }}">Go to Enrollment</a>
-            </div>
-        </div>
-    @endif
 
     @forelse($announcements as $a)
         <article class="feed-post">

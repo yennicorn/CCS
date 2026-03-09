@@ -15,6 +15,7 @@
     $femalePct = round(($female / $genderTotal) * 100);
     $otherPct = round(($other / $genderTotal) * 100);
     $unspecifiedPct = max(0, 100 - $malePct - $femalePct - $otherPct);
+    $gradeGenderStats = $stats['by_grade_gender'] ?? [];
     $gradePalette = [
         ['#2f7ebd', '#63a6d9'],
         ['#d1732f', '#e4a45f'],
@@ -52,26 +53,28 @@
 <section class="split">
     <article class="panel chart-panel">
         <div class="panel-head"><h3>Enrollment Distribution per Grade Level</h3></div>
-        @if(collect($stats['by_grade'])->isNotEmpty())
-            <div class="grade-bar-graph" role="img" aria-label="Enrollment distribution by grade level">
-                @foreach($stats['by_grade'] as $grade => $count)
-                    @php
-                        $pct = round(($count / $gradeTotal) * 100);
-                        $barHeight = max($pct, 8);
-                        [$barStart, $barEnd] = $gradePalette[$loop->index % count($gradePalette)];
-                    @endphp
-                    <div class="grade-bar-item" style="--bar-color-start: {{ $barStart }}; --bar-color-end: {{ $barEnd }};">
-                        <div class="grade-bar-value">{{ $count }}</div>
-                        <div class="grade-bar-track">
-                            <div class="grade-bar-fill" style="height: {{ $barHeight }}%;"></div>
-                        </div>
-                        <div class="grade-bar-label">{{ $grade }}</div>
+        <div class="grade-bar-graph" role="img" aria-label="Enrollment distribution by grade level">
+            @foreach($stats['by_grade'] as $grade => $count)
+                @php
+                    $pct = round(($count / $gradeTotal) * 100);
+                    $barHeight = max($pct, 8);
+                    [$barStart, $barEnd] = $gradePalette[$loop->index % count($gradePalette)];
+                    $maleByGrade = (int) data_get($gradeGenderStats, $grade.'.male', 0);
+                    $femaleByGrade = (int) data_get($gradeGenderStats, $grade.'.female', 0);
+                @endphp
+                <div
+                    class="grade-bar-item"
+                    style="--bar-color-start: {{ $barStart }}; --bar-color-end: {{ $barEnd }};"
+                    data-tooltip="Male: {{ $maleByGrade }} • Female: {{ $femaleByGrade }}"
+                >
+                    <div class="grade-bar-value">{{ $count }}</div>
+                    <div class="grade-bar-track">
+                        <div class="grade-bar-fill" style="height: {{ $barHeight }}%;"></div>
                     </div>
-                @endforeach
-            </div>
-        @else
-            <p class="muted">No enrollment data yet.</p>
-        @endif
+                    <div class="grade-bar-label">{{ $grade }}</div>
+                </div>
+            @endforeach
+        </div>
     </article>
 
     <article class="panel chart-panel">

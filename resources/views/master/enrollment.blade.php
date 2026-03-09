@@ -29,7 +29,7 @@
                         </div>
                     </td>
                     <td>{{ $app->grade_level }}</td>
-                    <td><span class="badge {{ $app->status }}">{{ strtoupper($app->status) }}</span></td>
+                    <td><span class="badge {{ $app->status }}">{{ \App\Support\StatusLabel::forSuperAdmin($app->status) }}</span></td>
                     <td>
                         <div class="action-row">
                             <form method="POST" action="{{ route('master.applications.decide', $app) }}">
