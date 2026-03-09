@@ -9,12 +9,9 @@
     $genderTotal = max(1, (int) collect($genderStats)->sum());
     $male = (int) ($genderStats['male'] ?? 0);
     $female = (int) ($genderStats['female'] ?? 0);
-    $other = (int) ($genderStats['other'] ?? 0);
-    $unspecified = (int) ($genderStats['unspecified'] ?? 0);
-    $malePct = round(($male / $genderTotal) * 100);
-    $femalePct = round(($female / $genderTotal) * 100);
-    $otherPct = round(($other / $genderTotal) * 100);
-    $unspecifiedPct = max(0, 100 - $malePct - $femalePct - $otherPct);
+    $knownGenderTotal = max(1, $male + $female);
+    $malePct = round(($male / $knownGenderTotal) * 100);
+    $femalePct = max(0, 100 - $malePct);
     $gradeGenderStats = $stats['by_grade_gender'] ?? [];
     $gradePalette = [
         ['#2f7ebd', '#63a6d9'],
@@ -80,12 +77,10 @@
     <article class="panel chart-panel">
         <div class="panel-head"><h3>Gender Distribution</h3></div>
         <div class="pie-wrap">
-            <div class="pie-chart" style="background: conic-gradient(#2f7ebd 0 {{ $malePct }}%, #d64b9a {{ $malePct }}% {{ $malePct + $femalePct }}%, #2f9d67 {{ $malePct + $femalePct }}% {{ $malePct + $femalePct + $otherPct }}%, #9aa6b2 {{ $malePct + $femalePct + $otherPct }}% 100%);"></div>
+            <div class="pie-chart" style="background: conic-gradient(#2f7ebd 0 {{ $malePct }}%, #d64b9a {{ $malePct }}% 100%);"></div>
             <div class="pie-legend">
                 <p><span class="dot d1"></span> Male: {{ $male }}</p>
                 <p><span class="dot d2"></span> Female: {{ $female }}</p>
-                <p><span class="dot d3"></span> Other: {{ $other }}</p>
-                <p><span class="dot d4"></span> Unspecified: {{ $unspecified }}</p>
             </div>
         </div>
     </article>

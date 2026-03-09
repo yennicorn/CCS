@@ -7,43 +7,34 @@
 <section class="panel">
     <div class="panel-head">
         <h3>Filter by Learner Name</h3>
-        <p class="muted">Search by full name, first name, middle name, or last name. You can also filter by Enrolled or Pending.</p>
+        <p class="muted">Search by full name, first name, middle name, or last name.</p>
     </div>
     <form method="GET" action="{{ route('master.monitoring') }}" class="action-inline">
         @if(!($showAllGrades ?? false))
             <input type="hidden" name="grade" value="{{ $selectedGrade ?? 'Kindergarten' }}">
         @endif
         <input type="text" name="name" value="{{ $nameFilter ?? '' }}" placeholder="Enter learner name..." style="max-width: 360px;">
-        <select name="status" style="max-width: 220px;">
-            <option value="pending" {{ ($selectedStatus ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
-            <option value="enrolled" {{ ($selectedStatus ?? 'pending') === 'enrolled' ? 'selected' : '' }}>Enrolled</option>
-        </select>
         <button class="btn" type="submit">Search</button>
-        @if(!empty($nameFilter) || (($selectedStatus ?? 'pending') !== 'pending'))
-            <a class="btn btn-secondary" href="{{ route('master.monitoring', ['grade' => $selectedGrade ?? 'Kindergarten', 'status' => 'pending']) }}">Clear</a>
+        @if(!empty($nameFilter))
+            <a class="btn btn-secondary" href="{{ route('master.monitoring', ['grade' => $selectedGrade ?? 'Kindergarten']) }}">Clear</a>
         @endif
     </form>
-    @if(!empty($nameFilter) || (($selectedStatus ?? 'pending') !== 'pending'))
+    @if(!empty($nameFilter))
         <p class="muted mt-10">
             {{ $matchedCount ?? 0 }} result(s)
             @if(!empty($nameFilter))
                 found for "{{ $nameFilter }}"
-            @endif
-            @if(($selectedStatus ?? 'pending') !== 'pending')
-                with status "{{ strtoupper($selectedStatus ?? 'pending') }}"
             @endif
             .
         </p>
     @endif
 </section>
 
-@if((($hasFilter ?? false) || (($selectedStatus ?? 'pending') !== 'pending')) && ($matchedCount ?? 0) === 0)
+@if(($hasFilter ?? false) && ($matchedCount ?? 0) === 0)
     <section class="panel">
         <p class="muted">
             @if(!empty($nameFilter))
                 No learner record found for "{{ $nameFilter }}".
-            @else
-                No applications found for status "{{ strtoupper($selectedStatus ?? 'pending') }}".
             @endif
         </p>
     </section>
@@ -64,7 +55,7 @@
         @foreach(($gradeLevels ?? []) as $grade)
             <a
                 class="grade-quick-nav-link {{ !($showAllGrades ?? false) && ($selectedGrade ?? '') === $grade ? 'is-active' : '' }}"
-                href="{{ route('master.monitoring', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null, 'status' => $selectedStatus ?? 'pending'])) }}"
+                href="{{ route('master.monitoring', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null])) }}"
             >
                 {{ $grade }}
             </a>
@@ -73,9 +64,6 @@
     <form method="GET" action="{{ route('master.monitoring') }}" class="grade-mobile-select">
         @if(!empty($nameFilter))
             <input type="hidden" name="name" value="{{ $nameFilter }}">
-        @endif
-        @if(($selectedStatus ?? 'pending') !== 'pending')
-            <input type="hidden" name="status" value="{{ $selectedStatus }}">
         @endif
         <label for="master_monitoring_grade_mobile">Quick Grade Jump</label>
         <select id="master_monitoring_grade_mobile" name="grade" onchange="this.form.submit()">

@@ -29,8 +29,6 @@
                 'application' => null,
                 'activeSchoolYear' => $activeSchoolYear,
                 'receivedDate' => now()->format('m/d/Y'),
-                'gradeLabel' => old('grade_level'),
-                'showGradeToEnroll' => false,
             ])
 
             @include('enduser.partials.enrollment-form-fields', [
@@ -96,19 +94,6 @@
             }
         });
     });
-
-    const gradeSelect = form.querySelector('select[name="grade_level"]');
-    const gradeHeaderField = document.getElementById('paper-grade-to-enroll');
-    const syncGradeHeader = () => {
-        if (!gradeSelect || !gradeHeaderField) {
-            return;
-        }
-        gradeHeaderField.value = gradeSelect.value || 'N/A';
-    };
-    if (gradeSelect) {
-        gradeSelect.addEventListener('change', syncGradeHeader);
-        syncGradeHeader();
-    }
 
     bindConditionalField('with_lrn', 'input[name="lrn"]');
     bindConditionalField('has_ip_affiliation', 'input[name="ip_affiliation"]');

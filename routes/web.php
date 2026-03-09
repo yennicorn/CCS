@@ -18,32 +18,31 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
-Route::get('/dashboard', function () {
-    if (!auth()->check()) {
-        return redirect()->route('login');
-    }
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return match (auth()->user()->role) {
+            'super_admin' => redirect()->route('master.dashboard'),
+            'admin' => redirect()->route('admin.dashboard'),
+            default => redirect()->route('homepage'),
+        };
+    })->name('dashboard');
 
-    return match (auth()->user()->role) {
-        'super_admin' => redirect()->route('master.dashboard'),
-        'admin' => redirect()->route('admin.dashboard'),
-        default => redirect()->route('homepage'),
-    };
-})->name('dashboard');
-Route::get('/home', fn () => redirect()->route('dashboard'));
-Route::get('/master-dashboard/{any?}', function (?string $any = null) {
-    $target = '/super-dashboard';
+    Route::get('/home', fn () => redirect()->route('dashboard'));
 
-    if ($any) {
-        $target .= '/'.$any;
-    }
+    Route::get('/master-dashboard/{any?}', function (?string $any = null) {
+        $target = '/super-dashboard';
 
-    return redirect($target);
-})->where('any', '.*');
+        if ($any) {
+            $target .= '/'.$any;
+        }
 
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+        return redirect($target);
+    })->where('any', '.*');
+});
 
 Route::middleware('guest')->group(function () {
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });

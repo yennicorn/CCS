@@ -43,6 +43,19 @@ class ApplicationController extends Controller
             return back()->withErrors(['application' => 'Enrollment is closed.']);
         }
 
+        if ($request->user()->role === 'student') {
+            $alreadySubmitted = Application::query()
+                ->where('user_id', $request->user()->id)
+                ->where('school_year_id', $schoolYear->id)
+                ->exists();
+
+            if ($alreadySubmitted) {
+                return back()->withErrors([
+                    'application' => 'You already submitted an enrollment for this school year.',
+                ]);
+            }
+        }
+
         $validated = $request->validate($this->rules());
 
         $application = Application::create(array_merge(

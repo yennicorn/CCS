@@ -10,7 +10,7 @@
 @endphp
 
 <div class="enrollment-instruction-line">
-    <strong>INSTRUCTIONS:</strong> Print legibly all information required in <strong>CAPITAL</strong> letters. Submit accomplished form to the school.
+    <strong>INSTRUCTIONS:</strong> Print legibly all information required in <strong>CAPITAL</strong> letters.
 </div>
 
 <div class="enrollment-form-body">

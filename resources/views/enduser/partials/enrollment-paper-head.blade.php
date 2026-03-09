@@ -9,9 +9,7 @@
             ?? $activeSchoolYear?->name
             ?? 'N/A');
 
-    $gradeLabel = $gradeLabel ?? ($application?->grade_level ?? old('grade_level', ''));
     $receivedDate = $receivedDate ?? optional($application?->submitted_at)->format('m/d/Y') ?? now()->format('m/d/Y');
-    $showGradeToEnroll = $showGradeToEnroll ?? true;
 @endphp
 
 <div class="enrollment-paper-head-formal">
@@ -33,10 +31,4 @@
         <label>School Year</label>
         <input type="text" id="paper-school-year" value="{{ $schoolYearLabel }}" readonly>
     </div>
-    @if($showGradeToEnroll)
-        <div>
-            <label>Grade To Enroll</label>
-            <input type="text" id="paper-grade-to-enroll" value="{{ $gradeLabel ?: 'N/A' }}" readonly>
-        </div>
-    @endif
 </div>

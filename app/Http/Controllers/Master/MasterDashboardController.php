@@ -98,25 +98,16 @@ class MasterDashboardController extends Controller
     {
         $nameFilter = $this->normalizeFilterInput((string) $request->input('name', ''));
         $selectedGrade = $this->resolveSelectedGrade((string) $request->input('grade', ''));
-        $selectedStatus = (string) $request->input('status', 'pending');
-        if (!in_array($selectedStatus, ['pending', 'enrolled'], true)) {
-            $selectedStatus = 'pending';
-        }
         $hasFilter = $nameFilter !== '';
-        $statusForcesAllGrades = in_array($selectedStatus, ['pending', 'enrolled'], true);
-        $showAllGrades = $hasFilter || $statusForcesAllGrades;
+        $showAllGrades = $hasFilter;
 
         $applicationsQuery = Application::query()
             ->whereIn('grade_level', self::GRADE_LEVELS);
 
-        if ($selectedStatus === 'enrolled') {
-            $applicationsQuery->where('status', 'approved');
-        } else {
-            $applicationsQuery->where(function (Builder $query) {
-                $query->whereNull('status')
-                    ->orWhere('status', '!=', 'approved');
-            });
-        }
+        $applicationsQuery->where(function (Builder $query) {
+            $query->whereNull('status')
+                ->orWhere('status', '!=', 'approved');
+        });
 
         if (!$showAllGrades) {
             $applicationsQuery->where('grade_level', $selectedGrade);
@@ -146,7 +137,7 @@ class MasterDashboardController extends Controller
         $matchedCount = $applications->count();
         $gradeLevels = self::GRADE_LEVELS;
 
-        return view('master.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'selectedStatus', 'showAllGrades'));
+        return view('master.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'showAllGrades'));
     }
 
     public function showMonitoringApplication(Application $application)
