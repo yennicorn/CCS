@@ -36,8 +36,8 @@
             </p>
         </div>
     @else
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap table-wrap-compact">
+            <table class="table-compact">
                 <thead>
                 <tr>
                     <th>Applicant</th>

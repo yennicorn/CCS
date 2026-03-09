@@ -30,7 +30,7 @@
     </section>
 @endif
 
-<section class="panel grade-quick-nav-panel">
+<section class="panel grade-quick-nav-panel grade-quick-nav-panel--priority">
     <div class="panel-head">
         <h3>Grade Level Navigation</h3>
         <p class="muted">Open one grade level at a time.</p>
@@ -68,8 +68,8 @@
         </div>
 
         <h4>Male</h4>
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap table-wrap-wide">
+            <table class="table-wide">
                 <thead>
                 <tr>
                     <th>Student Name</th>
@@ -107,8 +107,8 @@
         </div>
 
         <h4 class="mt-12">Female</h4>
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap table-wrap-wide">
+            <table class="table-wide">
                 <thead>
                 <tr>
                     <th>Student Name</th>
@@ -147,8 +147,8 @@
 
         @if($group['other']->isNotEmpty())
             <h4 class="mt-12">Other / Unspecified</h4>
-            <div class="table-wrap">
-                <table>
+            <div class="table-wrap table-wrap-wide">
+                <table class="table-wide">
                     <thead>
                     <tr>
                         <th>Student Name</th>

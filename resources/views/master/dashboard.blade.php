@@ -15,6 +15,15 @@
     $femalePct = round(($female / $genderTotal) * 100);
     $otherPct = round(($other / $genderTotal) * 100);
     $unspecifiedPct = max(0, 100 - $malePct - $femalePct - $otherPct);
+    $gradePalette = [
+        ['#2f7ebd', '#63a6d9'],
+        ['#d1732f', '#e4a45f'],
+        ['#2f9d67', '#62be8f'],
+        ['#7d63c7', '#a188dc'],
+        ['#c05252', '#da7d7d'],
+        ['#2f9aa4', '#67c1c9'],
+        ['#b08a2f', '#d4b363'],
+    ];
 @endphp
 
 <section class="dashboard-topbar panel">
@@ -43,22 +52,32 @@
 <section class="split">
     <article class="panel chart-panel">
         <div class="panel-head"><h3>Enrollment Distribution per Grade Level</h3></div>
-        @forelse($stats['by_grade'] as $grade => $count)
-            @php $pct = round(($count / $gradeTotal) * 100); @endphp
-            <div class="bar-row">
-                <div class="bar-label">{{ $grade }}</div>
-                <div class="bar-track"><div class="bar-fill" style="width: {{ $pct }}%;"></div></div>
-                <div class="bar-value">{{ $count }}</div>
+        @if(collect($stats['by_grade'])->isNotEmpty())
+            <div class="grade-bar-graph" role="img" aria-label="Enrollment distribution by grade level">
+                @foreach($stats['by_grade'] as $grade => $count)
+                    @php
+                        $pct = round(($count / $gradeTotal) * 100);
+                        $barHeight = max($pct, 8);
+                        [$barStart, $barEnd] = $gradePalette[$loop->index % count($gradePalette)];
+                    @endphp
+                    <div class="grade-bar-item" style="--bar-color-start: {{ $barStart }}; --bar-color-end: {{ $barEnd }};">
+                        <div class="grade-bar-value">{{ $count }}</div>
+                        <div class="grade-bar-track">
+                            <div class="grade-bar-fill" style="height: {{ $barHeight }}%;"></div>
+                        </div>
+                        <div class="grade-bar-label">{{ $grade }}</div>
+                    </div>
+                @endforeach
             </div>
-        @empty
+        @else
             <p class="muted">No enrollment data yet.</p>
-        @endforelse
+        @endif
     </article>
 
     <article class="panel chart-panel">
         <div class="panel-head"><h3>Gender Distribution</h3></div>
         <div class="pie-wrap">
-            <div class="pie-chart" style="background: conic-gradient(#2477b8 0 {{ $malePct }}%, #5f8ee8 {{ $malePct }}% {{ $malePct + $femalePct }}%, #67a0d8 {{ $malePct + $femalePct }}% {{ $malePct + $femalePct + $otherPct }}%, #d6e6f7 {{ $malePct + $femalePct + $otherPct }}% 100%);"></div>
+            <div class="pie-chart" style="background: conic-gradient(#2f7ebd 0 {{ $malePct }}%, #d64b9a {{ $malePct }}% {{ $malePct + $femalePct }}%, #2f9d67 {{ $malePct + $femalePct }}% {{ $malePct + $femalePct + $otherPct }}%, #9aa6b2 {{ $malePct + $femalePct + $otherPct }}% 100%);"></div>
             <div class="pie-legend">
                 <p><span class="dot d1"></span> Male: {{ $male }}</p>
                 <p><span class="dot d2"></span> Female: {{ $female }}</p>

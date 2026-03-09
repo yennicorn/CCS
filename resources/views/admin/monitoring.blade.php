@@ -30,7 +30,7 @@
     </section>
 @endif
 
-<section class="panel grade-quick-nav-panel">
+<section class="panel grade-quick-nav-panel grade-quick-nav-panel--priority">
     <div class="panel-head">
         <h3>Grade Level Navigation</h3>
         <p class="muted">Open one grade level at a time.</p>
@@ -64,8 +64,8 @@
             <h3>{{ $grade }}</h3>
             <p class="muted">{{ $items->count() }} application(s)</p>
         </div>
-        <div class="table-wrap">
-            <table>
+        <div class="table-wrap table-wrap-wide">
+            <table class="table-wide">
                 <thead>
                 <tr>
                     <th>Application #</th>

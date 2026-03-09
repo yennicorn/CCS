@@ -36,8 +36,8 @@
         Showing {{ $logs->firstItem() ?? 0 }}-{{ $logs->lastItem() ?? 0 }} of {{ $logs->total() }} log entries.
     </p>
 
-    <div class="table-wrap">
-        <table>
+    <div class="table-wrap table-wrap-compact">
+        <table class="table-compact">
             <thead>
             <tr>
                 <th>Timestamp</th>

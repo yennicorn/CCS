@@ -26,9 +26,16 @@ class ReportController extends Controller
         $rows = Application::select('id', 'learner_full_name', 'grade_level', 'gender', 'status', 'submitted_at')->get();
 
         $output = fopen('php://temp', 'r+');
-        fputcsv($output, ['Application ID', 'Learner Name', 'Grade Level', 'Gender', 'Status', 'Submitted At']);
+        fputcsv($output, ['Application ID', 'Learner Name', 'Grade Level', 'Gender', 'Status', 'Submitted At (PHT)']);
         foreach ($rows as $row) {
-            fputcsv($output, [$row->id, $row->learner_full_name, $row->grade_level, $row->gender, $row->status, $row->submitted_at]);
+            fputcsv($output, [
+                $row->id,
+                $row->learner_full_name,
+                $row->grade_level,
+                $row->gender,
+                $row->status,
+                optional($row->submitted_at)->timezone(config('app.timezone'))->format('Y-m-d h:i:s A') ?? '',
+            ]);
         }
         rewind($output);
         $csv = stream_get_contents($output);

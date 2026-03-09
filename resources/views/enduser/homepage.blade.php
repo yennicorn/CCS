@@ -71,8 +71,8 @@
         <h3><span class="icon-inline"><x-icon name="timeline" /> Submitted Learner Applications</span></h3>
     </div>
 
-    <div class="table-wrap mt-10">
-        <table>
+    <div class="table-wrap table-wrap--stack mt-10">
+        <table class="enduser-table--stack">
             <thead>
             <tr>
                 <th>Learner</th>
@@ -85,11 +85,11 @@
             <tbody>
             @forelse($applications as $entry)
                 <tr>
-                    <td>{{ $entry->learner_full_name }}</td>
-                    <td>{{ optional($entry->submitted_at)->format('M d, Y h:i A') ?? '-' }}</td>
-                    <td><span class="badge {{ $entry->status }}">{{ strtoupper($entry->status) }}</span></td>
-                    <td>{{ $entry->grade_level }}</td>
-                    <td><a class="btn btn-secondary" href="{{ route('applications.show', $entry) }}">Open Timeline</a></td>
+                    <td data-label="Learner">{{ $entry->learner_full_name }}</td>
+                    <td data-label="Submitted">{{ optional($entry->submitted_at)->format('M d, Y h:i A') ?? '-' }}</td>
+                    <td data-label="Status"><span class="badge {{ $entry->status }}">{{ strtoupper($entry->status) }}</span></td>
+                    <td data-label="Grade Level">{{ $entry->grade_level }}</td>
+                    <td data-label="Action"><a class="btn btn-secondary" href="{{ route('applications.show', $entry) }}">Open Timeline</a></td>
                 </tr>
             @empty
                 <tr><td colspan="5">No submitted applications yet.</td></tr>

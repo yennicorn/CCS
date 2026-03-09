@@ -58,12 +58,27 @@ class MasterDashboardController extends Controller
     {
         $nameFilter = $this->normalizeFilterInput((string) $request->input('name', ''));
         $selectedGrade = $this->resolveSelectedGrade((string) $request->input('grade', ''));
+        $selectedStatus = (string) $request->input('status', 'pending');
+        if (!in_array($selectedStatus, ['pending', 'enrolled'], true)) {
+            $selectedStatus = 'pending';
+        }
         $hasFilter = $nameFilter !== '';
+        $statusForcesAllGrades = in_array($selectedStatus, ['pending', 'enrolled'], true);
+        $showAllGrades = $hasFilter || $statusForcesAllGrades;
 
         $applicationsQuery = Application::query()
             ->whereIn('grade_level', self::GRADE_LEVELS);
 
-        if (!$hasFilter) {
+        if ($selectedStatus === 'enrolled') {
+            $applicationsQuery->where('status', 'approved');
+        } else {
+            $applicationsQuery->where(function (Builder $query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', 'approved');
+            });
+        }
+
+        if (!$showAllGrades) {
             $applicationsQuery->where('grade_level', $selectedGrade);
         }
 
@@ -76,22 +91,22 @@ class MasterDashboardController extends Controller
             ->latest('created_at')
             ->get();
 
-        $visibleGrades = $hasFilter ? self::GRADE_LEVELS : [$selectedGrade];
+        $visibleGrades = $showAllGrades ? self::GRADE_LEVELS : [$selectedGrade];
         $applicationsByGrade = collect($visibleGrades)
             ->mapWithKeys(fn ($grade) => [$grade => $applications->where('grade_level', $grade)->values()]);
 
-        if ($hasFilter) {
+        if ($showAllGrades) {
             $applicationsByGrade = $applicationsByGrade->filter(fn ($items) => $items->isNotEmpty());
         }
 
-        if ($hasFilter && $applicationsByGrade->isNotEmpty() && !$applicationsByGrade->has($selectedGrade)) {
+        if ($showAllGrades && $applicationsByGrade->isNotEmpty() && !$applicationsByGrade->has($selectedGrade)) {
             $selectedGrade = (string) $applicationsByGrade->keys()->first();
         }
 
         $matchedCount = $applications->count();
         $gradeLevels = self::GRADE_LEVELS;
 
-        return view('master.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels'));
+        return view('master.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'selectedStatus', 'showAllGrades'));
     }
 
     public function showMonitoringApplication(Application $application)

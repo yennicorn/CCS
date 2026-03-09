@@ -22,8 +22,8 @@
 </section>
 
 <section class="panel">
-    <div class="table-wrap">
-        <table>
+    <div class="table-wrap table-wrap-compact">
+        <table class="table-compact">
             <thead>
             <tr>
                 <th>Registered Account</th>
@@ -46,7 +46,7 @@
                     <td>{{ $application->learner_full_name }}</td>
                     <td>{{ $application->grade_level }}</td>
                     <td>{{ $application->schoolYear->year ?? $application->schoolYear->name ?? 'N/A' }}</td>
-                    <td><span class="badge {{ $application->status }}">{{ strtoupper($application->status) }}</span></td>
+                    <td><span class="badge {{ $application->status }}">{{ $application->status === 'approved' ? 'ENROLLED' : strtoupper($application->status) }}</span></td>
                     <td>{{ optional($application->submitted_at)->format('M d, Y h:i A') ?? optional($application->created_at)->format('M d, Y h:i A') }}</td>
                 </tr>
             @empty

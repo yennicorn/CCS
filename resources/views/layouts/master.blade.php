@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/branding/CCS_logo.png') }}">
     <link rel="stylesheet" href="{{ asset('css/ccs-ui.css') }}">
 </head>
-<body>
+<body class="admin-portal">
 <div class="app-shell">
     <aside class="sidebar" id="adminSidebar">
         <div class="sidebar-mobile-head">

@@ -27,8 +27,8 @@
         </div>
     @endif
 
-    <div class="table-wrap" style="margin-top:10px;">
-        <table>
+    <div class="table-wrap table-wrap--stack" style="margin-top:10px;">
+        <table class="enduser-table--stack">
             <thead>
             <tr>
                 <th>Date</th>
@@ -40,10 +40,10 @@
             <tbody>
             @forelse($application->statusLogs()->orderBy('changed_at')->get() as $log)
                 <tr>
-                    <td>{{ $log->changed_at }}</td>
-                    <td><span class="badge {{ $log->status }}">{{ strtoupper($log->status) }}</span></td>
-                    <td>{{ $log->remarks ?: '-' }}</td>
-                    <td>{{ optional($log->changedBy)->full_name ?? 'System' }}</td>
+                    <td data-label="Date">{{ optional($log->changed_at)->timezone(config('app.timezone'))->format('M d, Y h:i A') ?? '-' }}</td>
+                    <td data-label="Status"><span class="badge {{ $log->status }}">{{ strtoupper($log->status) }}</span></td>
+                    <td data-label="Remarks">{{ $log->remarks ?: '-' }}</td>
+                    <td data-label="Changed By">{{ optional($log->changedBy)->full_name ?? 'System' }}</td>
                 </tr>
             @empty
                 <tr><td colspan="4">No timeline entries yet.</td></tr>

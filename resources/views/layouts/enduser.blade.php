@@ -28,7 +28,11 @@
                 </a>
             </nav>
 
-            <div class="enduser-user">
+            <button type="button" class="enduser-account-toggle js-enduser-account-toggle" aria-expanded="false" aria-controls="enduserUserPanel">
+                Account Menu
+            </button>
+
+            <div class="enduser-user" id="enduserUserPanel">
                 <div class="enduser-user-meta">
                     <span>Signed in as</span>
                     <strong>{{ auth()->user()->full_name ?? 'User' }}</strong>
@@ -133,6 +137,55 @@
             closeModal();
         }
     });
+})();
+
+(() => {
+    const toggle = document.querySelector('.js-enduser-account-toggle');
+    const panel = document.getElementById('enduserUserPanel');
+    const mobileQuery = window.matchMedia('(max-width: 1000px)');
+
+    if (!toggle || !panel) {
+        return;
+    }
+
+    const setOpen = (open) => {
+        panel.classList.toggle('is-collapsed-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    toggle.addEventListener('click', () => {
+        setOpen(!panel.classList.contains('is-collapsed-open'));
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!mobileQuery.matches) {
+            return;
+        }
+
+        if (panel.contains(event.target) || toggle.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            setOpen(false);
+        }
+    });
+
+    const syncForViewport = () => {
+        if (!mobileQuery.matches) {
+            setOpen(false);
+        }
+    };
+
+    if (typeof mobileQuery.addEventListener === 'function') {
+        mobileQuery.addEventListener('change', syncForViewport);
+    } else {
+        mobileQuery.addListener(syncForViewport);
+    }
 })();
 </script>
 </body>

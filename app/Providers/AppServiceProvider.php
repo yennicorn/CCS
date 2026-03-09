@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        date_default_timezone_set(config('app.timezone', 'Asia/Manila'));
+
         Paginator::defaultView('vendor.pagination.ccs');
         Paginator::defaultSimpleView('vendor.pagination.ccs-simple');
     }
