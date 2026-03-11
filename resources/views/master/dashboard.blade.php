@@ -36,7 +36,6 @@
                 <span class="notif-badge">{{ $notificationCount > 99 ? '99+' : $notificationCount }}</span>
             @endif
         </a>
-        <div class="avatar">S</div>
     </div>
 </section>
 
