@@ -29,8 +29,27 @@
                 <p class="welcome-kicker">Welcome to</p>
                 <h1>CABUGBUGAN COMMUNITY SCHOOL!</h1>
                 <div class="welcome-actions">
-                    <a class="btn welcome-btn-login" href="{{ route('login') }}">Login</a>
-                    <a class="btn welcome-btn-register" href="{{ route('register') }}">Register</a>
+                    @auth
+                        @php
+                            $user = auth()->user();
+                            $requiresPasswordChange = (bool) ($user->force_password_change ?? false)
+                                && in_array((string) ($user->role ?? ''), ['super_admin', 'admin'], true);
+                        @endphp
+
+                        @if($requiresPasswordChange)
+                            <a class="btn welcome-btn-login" href="{{ route('password.change.form') }}">Change Password</a>
+                        @else
+                            <a class="btn welcome-btn-login" href="{{ route('dashboard') }}">Continue</a>
+                        @endif
+
+                        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                            @csrf
+                            <button class="btn welcome-btn-register" type="submit">Logout</button>
+                        </form>
+                    @else
+                        <a class="btn welcome-btn-login" href="{{ route('login') }}">Login</a>
+                        <a class="btn welcome-btn-register" href="{{ route('register') }}">Register</a>
+                    @endauth
                 </div>
             </section>
 

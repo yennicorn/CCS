@@ -26,18 +26,11 @@
             <section class="auth-welcome-message">
                 <p class="welcome-kicker">Password Update</p>
                 <h1>Set a fresh password to secure your account.</h1>
-                <p class="auth-welcome-copy">For security, your account requires a password update before you can continue.</p>
-
-                <div class="auth-brand-seal">
-                    <img src="{{ asset('images/branding/CCS_logo.png') }}" alt="School seal logo">
-                </div>
             </section>
 
             <section class="auth-shell-card auth-shell-card--welcome auth-shell-card--update">
                 <div class="auth-shell-head">
-                    <span class="auth-chip">Security Check</span>
                     <h2>Password Update Required</h2>
-                    <p>Please set a new secure password to continue.</p>
                 </div>
 
                 @if($errors->any())

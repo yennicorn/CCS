@@ -80,6 +80,10 @@ class AuthController extends Controller
         // Ensure first redirect after a successful login always reaches the role landing page.
         $request->session()->put('allow_role_landing_once', true);
 
+        if ($user->force_password_change && in_array((string) $user->role, ['super_admin', 'admin'], true)) {
+            return redirect()->route('password.change.form');
+        }
+
         return $this->redirectByRole($user->role);
     }
 

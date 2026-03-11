@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user()->force_password_change && in_array((string) auth()->user()->role, ['super_admin', 'admin'], true)) {
+            return redirect()->route('password.change.form');
+        }
+
         return match (auth()->user()->role) {
             'super_admin' => redirect()->route('master.dashboard'),
             'admin' => redirect()->route('admin.dashboard'),

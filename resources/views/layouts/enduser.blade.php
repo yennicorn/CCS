@@ -29,10 +29,21 @@
             </nav>
 
             <button type="button" class="enduser-account-toggle js-enduser-account-toggle" aria-expanded="false" aria-controls="enduserUserPanel">
-                Account Menu
+                <span class="enduser-account-toggle__icon" aria-hidden="true">
+                    <span class="enduser-account-toggle__bar"></span>
+                    <span class="enduser-account-toggle__bar"></span>
+                    <span class="enduser-account-toggle__bar"></span>
+                </span>
+                <span class="enduser-account-toggle__label sr-only">Account Menu</span>
             </button>
 
             <div class="enduser-user" id="enduserUserPanel">
+                <div class="enduser-drawer-head">
+                    <strong>Account</strong>
+                    <button type="button" class="enduser-drawer-close" data-enduser-account-close aria-label="Close account menu">
+                        Close
+                    </button>
+                </div>
                 <div class="enduser-user-meta">
                     <span>Signed in as</span>
                     <strong>{{ auth()->user()->full_name ?? 'User' }}</strong>
@@ -45,6 +56,7 @@
             </div>
         </div>
     </header>
+    <button type="button" class="enduser-account-backdrop" data-enduser-account-close aria-label="Close account menu"></button>
 
     <main class="enduser-main">
         <section class="enduser-pagehead print-hide">
@@ -142,6 +154,7 @@
 (() => {
     const toggle = document.querySelector('.js-enduser-account-toggle');
     const panel = document.getElementById('enduserUserPanel');
+    const closeTargets = document.querySelectorAll('[data-enduser-account-close]');
     const mobileQuery = window.matchMedia('(max-width: 1000px)');
 
     if (!toggle || !panel) {
@@ -149,12 +162,16 @@
     }
 
     const setOpen = (open) => {
-        panel.classList.toggle('is-collapsed-open', open);
+        document.body.classList.toggle('enduser-account-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
 
     toggle.addEventListener('click', () => {
-        setOpen(!panel.classList.contains('is-collapsed-open'));
+        setOpen(!document.body.classList.contains('enduser-account-open'));
+    });
+
+    closeTargets.forEach((target) => {
+        target.addEventListener('click', () => setOpen(false));
     });
 
     document.addEventListener('click', (event) => {

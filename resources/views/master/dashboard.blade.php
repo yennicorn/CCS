@@ -47,7 +47,7 @@
     <article class="stat-hero stat-green"><span class="icon"><x-icon name="approved" /></span><div><h3>{{ $stats['approved'] }}</h3><p>Enrolled Students</p></div></article>
 </section>
 
-<section class="split">
+<section class="chart-stack">
     <article class="panel chart-panel">
         <div class="panel-head"><h3>Enrollment Distribution per Grade Level</h3></div>
         <div class="grade-bar-graph" role="img" aria-label="Enrollment distribution by grade level">
@@ -62,7 +62,7 @@
                 <div
                     class="grade-bar-item"
                     style="--bar-color-start: {{ $barStart }}; --bar-color-end: {{ $barEnd }};"
-                    data-tooltip="Male: {{ $maleByGrade }} • Female: {{ $femaleByGrade }}"
+                    data-tooltip="Male: {{ $maleByGrade }} | Female: {{ $femaleByGrade }}"
                 >
                     <div class="grade-bar-value">{{ $count }}</div>
                     <div class="grade-bar-track">

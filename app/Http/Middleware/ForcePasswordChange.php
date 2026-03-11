@@ -31,8 +31,6 @@ class ForcePasswordChange
         $role = (string) (Auth::user()->role ?? '');
 
         return match ($role) {
-            'super_admin' => $request->routeIs('master.dashboard'),
-            'admin' => $request->routeIs('admin.dashboard'),
             'parent', 'student' => $request->routeIs('homepage', 'homepage.feed', 'homepage.enrollment'),
             default => false,
         };
