@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,24 +30,13 @@
                 <h1>CABUGBUGAN COMMUNITY SCHOOL!</h1>
                 <div class="welcome-actions">
                     @auth
-                        @php
-                            $user = auth()->user();
-                            $requiresPasswordChange = (bool) ($user->force_password_change ?? false)
-                                && in_array((string) ($user->role ?? ''), ['super_admin', 'admin'], true);
-                        @endphp
-
-                        @if($requiresPasswordChange)
-                            <a class="btn welcome-btn-login" href="{{ route('password.change.form') }}">Change Password</a>
-                        @else
-                            <a class="btn welcome-btn-login" href="{{ route('dashboard') }}">Continue</a>
-                        @endif
-
+                        <a class="btn welcome-btn-login" href="{{ route('dashboard') }}">Continue</a>
                         <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                             @csrf
                             <button class="btn btn-logout" type="submit">Logout</button>
                         </form>
                     @else
-                        <a class="btn welcome-btn-login" href="{{ route('login') }}">Login</a>
+                        <a class="btn welcome-btn-login" href="{{ route('login') }}">Sign In</a>
                         <a class="btn welcome-btn-register" href="{{ route('register') }}">Register</a>
                     @endauth
                 </div>

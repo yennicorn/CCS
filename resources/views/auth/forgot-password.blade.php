@@ -26,7 +26,7 @@
             <section class="auth-welcome-message">
                 <p class="welcome-kicker">Account Recovery</p>
                 <h1>Reset your password securely.</h1>
-                <p class="welcome-subtitle">Enter your registered email address. The system will detect your account type automatically.</p>
+                <p class="welcome-subtitle">Enter your registered email address. </p>
             </section>
 
             <section class="auth-shell-card auth-shell-card--welcome auth-shell-card--update">

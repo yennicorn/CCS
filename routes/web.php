@@ -43,7 +43,8 @@ Route::middleware('auth')->group(function () {
         return match (auth()->user()->role) {
             'super_admin' => redirect()->route('master.dashboard'),
             'admin' => redirect()->route('admin.dashboard'),
-            default => redirect()->route('homepage'),
+            'parent', 'student' => redirect()->route('homepage.feed'),
+            default => redirect()->route('homepage.feed'),
         };
     })->name('dashboard');
 
