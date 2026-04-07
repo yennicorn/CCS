@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationStatusLog;
+use App\Models\Announcement;
 use App\Models\SchoolYear;
 use App\Models\User;
 use App\Support\AuditLogger;
@@ -86,7 +87,14 @@ class AdminDashboardController extends Controller
 
         $notificationCount = (int) $stats['pending'];
 
-        return view('admin.dashboard', compact('stats', 'genderStats', 'notificationCount'));
+        $announcements = Announcement::query()
+            ->with('author')
+            ->orderByDesc('pinned_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'genderStats', 'notificationCount', 'announcements'));
     }
 
     public function applications(Request $request)

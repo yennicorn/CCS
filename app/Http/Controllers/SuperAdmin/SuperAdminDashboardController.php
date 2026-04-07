@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\Announcement;
 use App\Models\AuditLog;
 use App\Models\ApplicationStatusLog;
 use App\Models\SchoolYear;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
-class MasterDashboardController extends Controller
+class SuperAdminDashboardController extends Controller
 {
     private const GRADE_LEVELS = ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
 
@@ -91,7 +92,14 @@ class MasterDashboardController extends Controller
 
         $notificationCount = (int) $stats['pending'];
 
-        return view('master.dashboard', compact('stats', 'genderStats', 'notificationCount'));
+        $announcements = Announcement::query()
+            ->with('author')
+            ->orderByDesc('pinned_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
+        return view('super-admin.dashboard', compact('stats', 'genderStats', 'notificationCount', 'announcements'));
     }
 
     public function monitoring(Request $request)
@@ -137,7 +145,7 @@ class MasterDashboardController extends Controller
         $matchedCount = $applications->count();
         $gradeLevels = self::GRADE_LEVELS;
 
-        return view('master.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'showAllGrades'));
+        return view('super-admin.monitoring', compact('applicationsByGrade', 'nameFilter', 'matchedCount', 'hasFilter', 'selectedGrade', 'gradeLevels', 'showAllGrades'));
     }
 
     public function showMonitoringApplication(Application $application)
@@ -146,7 +154,7 @@ class MasterDashboardController extends Controller
 
         $canEdit = session()->has($this->unlockSessionKey($application->id));
 
-        return view('master.monitoring-show', compact('application', 'canEdit'));
+        return view('super-admin.monitoring-show', compact('application', 'canEdit'));
     }
 
     public function unlockMonitoringEdit(Request $request, Application $application)
@@ -387,7 +395,7 @@ class MasterDashboardController extends Controller
     {
         $applications = Application::where('status', 'reviewed')->latest()->paginate(10);
 
-        return view('master.enrollment', compact('applications'));
+        return view('super-admin.enrollment', compact('applications'));
     }
 
     public function enrolledStudents(Request $request)
@@ -451,7 +459,7 @@ class MasterDashboardController extends Controller
 
         $gradeLevels = self::GRADE_LEVELS;
 
-        return view('master.enrolled-students', compact('enrolledByGrade', 'nameFilter', 'hasFilter', 'matchedCount', 'duplicateApplicationIds', 'selectedGrade', 'gradeLevels'));
+        return view('super-admin.enrolled-students', compact('enrolledByGrade', 'nameFilter', 'hasFilter', 'matchedCount', 'duplicateApplicationIds', 'selectedGrade', 'gradeLevels'));
     }
 
     public function enrollmentHistory(Request $request)
@@ -505,7 +513,7 @@ class MasterDashboardController extends Controller
 
         $matchedCount = $history->total();
 
-        return view('master.enrollment-history', compact('history', 'nameFilter', 'hasFilter', 'matchedCount'));
+        return view('super-admin.enrollment-history', compact('history', 'nameFilter', 'hasFilter', 'matchedCount'));
     }
 
     public function destroyDuplicateEnrollee(Application $application)
@@ -560,14 +568,14 @@ class MasterDashboardController extends Controller
         $activeSchoolYear = SchoolYear::where('is_active', true)->first();
         $supportsLocking = Schema::hasColumn('school_years', 'is_locked');
 
-        return view('master.school-years', compact('schoolYears', 'activeSchoolYear', 'supportsEnrollmentWindow', 'supportsLocking'));
+        return view('super-admin.school-years', compact('schoolYears', 'activeSchoolYear', 'supportsEnrollmentWindow', 'supportsLocking'));
     }
 
     public function backup()
     {
         $recentAuditLogs = AuditLog::latest()->take(8)->get();
 
-        return view('master.backup', compact('recentAuditLogs'));
+        return view('super-admin.backup', compact('recentAuditLogs'));
     }
 
     private function unlockSessionKey(int $applicationId): string

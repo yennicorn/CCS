@@ -1,9 +1,9 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Enrollment Form')
 @section('page_subtitle', 'View, print, and securely edit enrollment application')
 @section('page_title_above')
-    <a class="btn btn-logout btn-icon" href="{{ route('master.monitoring') }}" aria-label="Return to monitoring list">
+    <a class="btn btn-logout btn-icon" href="{{ route('super-admin.monitoring') }}" aria-label="Return to monitoring list">
         <x-icon name="back" />
         <span class="sr-only">Return</span>
     </a>
@@ -20,7 +20,7 @@
     </div>
 
     @if(!$canEdit)
-        <form method="POST" action="{{ route('master.monitoring.unlock-edit', $application) }}">
+        <form method="POST" action="{{ route('super-admin.monitoring.unlock-edit', $application) }}">
             @csrf
             <label>Super Admin Password (required to edit)</label>
             <input type="password" name="password" required>
@@ -37,7 +37,7 @@
         ])
 
         @if($canEdit)
-            <form method="POST" action="{{ route('master.monitoring.update', $application) }}">
+            <form method="POST" action="{{ route('super-admin.monitoring.update', $application) }}">
                 @csrf
                 @method('PUT')
                 @include('enduser.partials.enrollment-form-fields', [

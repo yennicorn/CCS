@@ -1,7 +1,7 @@
-@extends('layouts.admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Account Settings')
-@section('page_subtitle', 'Administrator account security settings')
+@section('page_subtitle', 'Super Administrator account security settings')
 
 @section('content')
 @php
@@ -26,18 +26,18 @@
         <div class="settings-profile-meta">
             <p class="muted">Signed in as</p>
             <p class="settings-profile-name"><strong>{{ $displayName }}</strong></p>
-            <p class="settings-profile-role">Administrator</p>
+            <p class="settings-profile-role">Super Administrator</p>
         </div>
     </div>
 
-    <form method="POST" action="{{ route('admin.settings.profile.update') }}" class="mt-10">
+    <form method="POST" action="{{ route('super-admin.settings.profile.update') }}" class="mt-10">
         @csrf
         <label>Full Name</label>
         <input type="text" name="full_name" value="{{ old('full_name', $user->full_name) }}" required>
         <button class="btn mt-10" type="submit">Save Name</button>
     </form>
 
-    <form method="POST" action="{{ route('admin.settings.profile-photo.update') }}" enctype="multipart/form-data" class="mt-10">
+    <form method="POST" action="{{ route('super-admin.settings.profile-photo.update') }}" enctype="multipart/form-data" class="mt-10">
         @csrf
         <label>Profile Picture</label>
         <input type="file" name="profile_photo" accept="image/png,image/jpeg,image/webp" required>
@@ -47,7 +47,7 @@
     </form>
 
     @if($photoUrl)
-        <form method="POST" action="{{ route('admin.settings.profile-photo.remove') }}" class="mt-10">
+        <form method="POST" action="{{ route('super-admin.settings.profile-photo.remove') }}" class="mt-10">
             @csrf
             <button class="btn btn-danger" type="submit">Remove Picture</button>
         </form>
@@ -57,11 +57,11 @@
 <section class="panel">
     <div class="panel-head">
         <h3>Change Email and Password</h3>
-        <p class="muted">You can change your mail address and set a new password for your Admin account.</p>
+        <p class="muted">You can change your email address and set a new password for your Super Admin account.</p>
         <p class="muted">Current email: <strong>{{ $user->email }}</strong></p>
     </div>
 
-    <form method="POST" action="{{ route('admin.settings.update') }}">
+    <form method="POST" action="{{ route('super-admin.settings.password.update') }}">
         @csrf
 
         <label>New Email Address</label>

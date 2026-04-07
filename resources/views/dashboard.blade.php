@@ -12,7 +12,7 @@
     <div class="panel-head"><h2> System Dashboard</h2></div>
     <p>This legacy dashboard page is retained for compatibility. Active role dashboards are now under:</p>
     <ul>
-        <li><strong>Super Admin:</strong> <code>/super-dashboard</code></li>
+        <li><strong>Super Admin:</strong> <code>/superadmin-dashboard</code></li>
         <li><strong>Admin:</strong> <code>/admin-dashboard</code></li>
         <li><strong>Parent/Student:</strong> <code>/homepage</code></li>
     </ul>

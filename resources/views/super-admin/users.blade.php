@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'User Accounts')
 @section('page_subtitle', 'Role management and account activation control')
@@ -31,7 +31,7 @@
                     </td>
                     <td>
                         @if($user->role !== 'super_admin')
-                            <form method="POST" action="{{ route('master.users.update-role', $user) }}">
+                            <form method="POST" action="{{ route('super-admin.users.update-role', $user) }}">
                                 @csrf
                                 <select name="role">
                                     <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>admin</option>
@@ -46,7 +46,7 @@
                     </td>
                     <td>
                         @if($user->id !== auth()->id())
-                            <form method="POST" action="{{ route('master.users.toggle-active', $user) }}">
+                            <form method="POST" action="{{ route('super-admin.users.toggle-active', $user) }}">
                                 @csrf
                                 <button class="btn {{ $user->is_active ? 'btn-danger' : 'btn' }}" type="submit">
                                     {{ $user->is_active ? 'Deactivate' : 'Activate' }}

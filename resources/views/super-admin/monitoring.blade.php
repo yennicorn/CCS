@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Manage Enrollment')
 @section('page_subtitle', 'Enrollment application records grouped by grade level')
@@ -9,14 +9,14 @@
         <h3>Filter by Learner Name</h3>
         <p class="muted">Search by full name, first name, middle name, or last name.</p>
     </div>
-    <form method="GET" action="{{ route('master.monitoring') }}" class="action-inline">
+    <form method="GET" action="{{ route('super-admin.monitoring') }}" class="action-inline">
         @if(!($showAllGrades ?? false))
             <input type="hidden" name="grade" value="{{ $selectedGrade ?? 'Kindergarten' }}">
         @endif
         <input type="text" name="name" value="{{ $nameFilter ?? '' }}" placeholder="Enter learner name..." style="max-width: 360px;">
         <button class="btn" type="submit">Search</button>
         @if(!empty($nameFilter))
-            <a class="btn btn-secondary" href="{{ route('master.monitoring', ['grade' => $selectedGrade ?? 'Kindergarten']) }}">Clear</a>
+            <a class="btn btn-secondary" href="{{ route('super-admin.monitoring', ['grade' => $selectedGrade ?? 'Kindergarten']) }}">Clear</a>
         @endif
     </form>
     @if(!empty($nameFilter))
@@ -55,13 +55,13 @@
         @foreach(($gradeLevels ?? []) as $grade)
             <a
                 class="grade-quick-nav-link {{ !($showAllGrades ?? false) && ($selectedGrade ?? '') === $grade ? 'is-active' : '' }}"
-                href="{{ route('master.monitoring', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null])) }}"
+                href="{{ route('super-admin.monitoring', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null])) }}"
             >
                 {{ $grade }}
             </a>
         @endforeach
     </nav>
-    <form method="GET" action="{{ route('master.monitoring') }}" class="grade-mobile-select">
+    <form method="GET" action="{{ route('super-admin.monitoring') }}" class="grade-mobile-select">
         @if(!empty($nameFilter))
             <input type="hidden" name="name" value="{{ $nameFilter }}">
         @endif
@@ -113,9 +113,9 @@
                         <td><span class="badge {{ $displayStatusClass }}">{{ $displayStatus }}</span></td>
                         <td>{{ optional($application->submitted_at)->format('m/d/Y h:i A') ?? '-' }}</td>
                         <td class="action-row">
-                            <a class="btn" href="{{ route('master.monitoring.show', $application) }}">View Enrollment Form</a>
+                            <a class="btn" href="{{ route('super-admin.monitoring.show', $application) }}">View Enrollment Form</a>
                             @if($application->canReceiveFinalDecision())
-                                <form method="POST" action="{{ route('master.applications.decide', $application) }}">
+                                <form method="POST" action="{{ route('super-admin.applications.decide', $application) }}">
                                     @csrf
                                     <input type="hidden" name="status" value="approved">
                                     <button class="btn btn-secondary" type="submit">Enroll Student</button>

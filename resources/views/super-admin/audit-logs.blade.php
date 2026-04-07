@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'System Activity Logs')
 @section('page_subtitle', 'System-sensitive activity records')
@@ -9,7 +9,7 @@
         <h3>Audit Trail</h3>
         <p class="muted">Search and filter logs, then navigate pages faster.</p>
     </div>
-    <form method="GET" action="{{ route('master.audit-logs.index') }}" class="action-inline">
+    <form method="GET" action="{{ route('super-admin.audit-logs.index') }}" class="action-inline">
         <input type="text" name="q" value="{{ $search ?? '' }}" placeholder="Search action, entity, IP, user ID..." style="min-width: 260px; max-width: 380px;">
         <select name="action" style="max-width: 220px;">
             <option value="">All Actions</option>
@@ -29,7 +29,7 @@
             @endforeach
         </select>
         <button class="btn" type="submit">Apply</button>
-        <a class="btn btn-secondary" href="{{ route('master.audit-logs.index') }}">Reset</a>
+        <a class="btn btn-secondary" href="{{ route('super-admin.audit-logs.index') }}">Reset</a>
     </form>
 
     <p class="muted mt-10">

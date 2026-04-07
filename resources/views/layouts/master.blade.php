@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="{{ asset('css/ccs-ui.css') }}">
 </head>
 <body class="admin-portal">
+@php
+    $signedUser = auth()->user();
+    $signedName = $signedUser?->displayName() ?? 'User';
+
+    $signedRole = (string) ($signedUser->role ?? 'user');
+    $signedRoleLabel = $signedUser?->roleLabel() ?? \Illuminate\Support\Str::title(str_replace('_', ' ', $signedRole));
+
+    $signedInitials = $signedUser?->initials() ?? 'U';
+    $signedPhotoUrl = $signedUser?->profilePhotoUrl();
+
+    $settingsRoute = match ($signedRole) {
+        'super_admin' => route('super-admin.settings.index'),
+        'admin' => route('admin.settings.index'),
+        default => null,
+    };
+@endphp
 <div class="app-shell">
     <aside class="sidebar" id="adminSidebar">
         <div class="sidebar-mobile-head">
@@ -27,9 +43,20 @@
         </nav>
 
         <div class="sidebar-footer">
-            <p class="muted">Signed in as</p>
-            <p><strong>{{ auth()->user()->full_name ?? 'User' }}</strong></p>
-            <p class="role-text">{{ strtoupper(str_replace('_', ' ', auth()->user()->role ?? 'USER')) }}</p>
+            <div class="sidebar-user">
+                @if($signedPhotoUrl)
+                    <div class="sidebar-avatar" aria-hidden="true">
+                        <img src="{{ $signedPhotoUrl }}" alt="Profile photo">
+                    </div>
+                @else
+                    <div class="sidebar-avatar sidebar-avatar--placeholder" aria-hidden="true">{{ $signedInitials ?: 'U' }}</div>
+                @endif
+                <div class="sidebar-user__meta">
+                    <p class="muted">Signed in as:</p>
+                    <p class="sidebar-user__name"><strong>{{ $signedName }}</strong></p>
+                    <p class="sidebar-user__role">{{ $signedRoleLabel }}</p>
+                </div>
+            </div>
             <form method="POST" action="{{ route('logout') }}" class="js-logout-form">
                 @csrf
                 <button class="btn btn-logout w-full" type="submit">Logout</button>
@@ -57,6 +84,21 @@
                     <h1 class="page-title">@yield('page_title', 'Dashboard')</h1>
                     <p class="muted">@yield('page_subtitle', 'Cabugbugan Community School Management Portal')</p>
                 </div>
+                @if($settingsRoute)
+                    <a class="topbar-user" href="{{ $settingsRoute }}" aria-label="Open account settings">
+                        @if($signedPhotoUrl)
+                            <span class="topbar-user__avatar" aria-hidden="true">
+                                <img src="{{ $signedPhotoUrl }}" alt="Profile photo">
+                            </span>
+                        @else
+                            <span class="topbar-user__avatar topbar-user__avatar--placeholder" aria-hidden="true">{{ $signedInitials ?: 'U' }}</span>
+                        @endif
+                        <span class="topbar-user__meta">
+                            <span class="topbar-user__name">{{ $signedName }}</span>
+                            <span class="topbar-user__role">{{ $signedRoleLabel }}</span>
+                        </span>
+                    </a>
+                @endif
             </div>
         </header>
 

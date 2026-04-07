@@ -1,5 +1,5 @@
-@php($prefix = auth()->user()->role === 'super_admin' ? 'master' : 'admin')
-@extends(auth()->user()->role === 'super_admin' ? 'layouts.master-admin' : 'layouts.admin')
+@php($prefix = auth()->user()->role === 'super_admin' ? 'super-admin' : 'admin')
+@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : 'layouts.admin')
 
 @section('page_title', 'Announcements')
 @section('page_subtitle', 'Create, schedule, and manage official posts')

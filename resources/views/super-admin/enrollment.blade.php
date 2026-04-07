@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Manage Enrollment')
 @section('page_subtitle', 'Final approval queue for reviewed applications')
@@ -32,7 +32,7 @@
                     <td><span class="badge {{ $app->status }}">{{ \App\Support\StatusLabel::forSuperAdmin($app->status) }}</span></td>
                     <td>
                         <div class="action-row">
-                            <form method="POST" action="{{ route('master.applications.decide', $app) }}">
+                            <form method="POST" action="{{ route('super-admin.applications.decide', $app) }}">
                                 @csrf
                                 <input type="hidden" name="status" value="approved">
                                 <button class="btn" type="submit">Enroll Student</button>

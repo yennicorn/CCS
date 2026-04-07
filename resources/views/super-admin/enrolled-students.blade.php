@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Enrolled Students')
 @section('page_subtitle', 'Final approved enrollees grouped by grade level and sex')
@@ -9,12 +9,12 @@
         <h3>Filter Enrolled Students</h3>
         <p class="muted">Search by learner name or LRN.</p>
     </div>
-    <form method="GET" action="{{ route('master.enrolled-students') }}" class="action-inline">
+    <form method="GET" action="{{ route('super-admin.enrolled-students') }}" class="action-inline">
         <input type="hidden" name="grade" value="{{ $selectedGrade ?? 'Kindergarten' }}">
         <input type="text" name="name" value="{{ $nameFilter ?? '' }}" placeholder="Enter learner name or LRN..." style="max-width: 360px;">
         <button class="btn" type="submit">Search</button>
         @if(!empty($nameFilter))
-            <a class="btn btn-secondary" href="{{ route('master.enrolled-students', ['grade' => $selectedGrade ?? 'Kindergarten']) }}">Clear</a>
+            <a class="btn btn-secondary" href="{{ route('super-admin.enrolled-students', ['grade' => $selectedGrade ?? 'Kindergarten']) }}">Clear</a>
         @endif
     </form>
     @if(!empty($nameFilter))
@@ -39,13 +39,13 @@
         @foreach(($gradeLevels ?? []) as $grade)
             <a
                 class="grade-quick-nav-link {{ ($selectedGrade ?? '') === $grade ? 'is-active' : '' }}"
-                href="{{ route('master.enrolled-students', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null])) }}"
+                href="{{ route('super-admin.enrolled-students', array_filter(['grade' => $grade, 'name' => $nameFilter ?? null])) }}"
             >
                 {{ $grade }}
             </a>
         @endforeach
     </nav>
-    <form method="GET" action="{{ route('master.enrolled-students') }}" class="grade-mobile-select">
+    <form method="GET" action="{{ route('super-admin.enrolled-students') }}" class="grade-mobile-select">
         @if(!empty($nameFilter))
             <input type="hidden" name="name" value="{{ $nameFilter }}">
         @endif
@@ -88,10 +88,10 @@
                         <td>{{ $application->lrn ?: 'N/A' }}</td>
                         <td>Male</td>
                         <td class="action-row">
-                            <a class="btn" href="{{ route('master.monitoring.show', $application) }}">View Enrollment Form</a>
+                            <a class="btn" href="{{ route('super-admin.monitoring.show', $application) }}">View Enrollment Form</a>
                             @if(in_array($application->id, $duplicateApplicationIds ?? [], true))
                                 <span class="badge rejected">DUPLICATE</span>
-                                <form method="POST" action="{{ route('master.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
+                                <form method="POST" action="{{ route('super-admin.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-danger" type="submit">Delete Duplicate</button>
@@ -127,10 +127,10 @@
                         <td>{{ $application->lrn ?: 'N/A' }}</td>
                         <td>Female</td>
                         <td class="action-row">
-                            <a class="btn" href="{{ route('master.monitoring.show', $application) }}">View Enrollment Form</a>
+                            <a class="btn" href="{{ route('super-admin.monitoring.show', $application) }}">View Enrollment Form</a>
                             @if(in_array($application->id, $duplicateApplicationIds ?? [], true))
                                 <span class="badge rejected">DUPLICATE</span>
-                                <form method="POST" action="{{ route('master.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
+                                <form method="POST" action="{{ route('super-admin.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-danger" type="submit">Delete Duplicate</button>
@@ -167,10 +167,10 @@
                             <td>{{ $application->lrn ?: 'N/A' }}</td>
                             <td>{{ ucfirst($application->gender ?? 'unspecified') }}</td>
                             <td class="action-row">
-                                <a class="btn" href="{{ route('master.monitoring.show', $application) }}">View Enrollment Form</a>
+                                <a class="btn" href="{{ route('super-admin.monitoring.show', $application) }}">View Enrollment Form</a>
                                 @if(in_array($application->id, $duplicateApplicationIds ?? [], true))
                                     <span class="badge rejected">DUPLICATE</span>
-                                    <form method="POST" action="{{ route('master.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
+                                    <form method="POST" action="{{ route('super-admin.enrollees.destroy-duplicate', $application) }}" onsubmit="return confirm('Delete this duplicate enrollee record?');">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-danger" type="submit">Delete Duplicate</button>

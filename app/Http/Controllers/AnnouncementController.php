@@ -83,7 +83,7 @@ class AnnouncementController extends Controller
         if ($reset) {
             session()->forget($sessionKey);
             $redirectQuery = array_filter(['tab' => $tab], fn ($value) => $value !== null && $value !== '');
-            return redirect()->route(auth()->user()->role === 'super_admin' ? 'master.announcements.index' : 'admin.announcements.index', $redirectQuery);
+            return redirect()->route(auth()->user()->role === 'super_admin' ? 'super-admin.announcements.index' : 'admin.announcements.index', $redirectQuery);
         }
 
         $hasAnyFilter = false;
@@ -100,7 +100,7 @@ class AnnouncementController extends Controller
             $saved = (array) session()->get($sessionKey, []);
             if ($saved) {
                 $redirectQuery = array_merge(['tab' => $tab], array_filter($saved, fn ($value) => $value !== null && $value !== ''));
-                return redirect()->route(auth()->user()->role === 'super_admin' ? 'master.announcements.index' : 'admin.announcements.index', $redirectQuery);
+                return redirect()->route(auth()->user()->role === 'super_admin' ? 'super-admin.announcements.index' : 'admin.announcements.index', $redirectQuery);
             }
         }
 
@@ -282,7 +282,7 @@ class AnnouncementController extends Controller
             }
         }
 
-        $indexRoute = auth()->user()->role === 'super_admin' ? 'master.announcements.index' : 'admin.announcements.index';
+        $indexRoute = auth()->user()->role === 'super_admin' ? 'super-admin.announcements.index' : 'admin.announcements.index';
         $message = $announcement->is_draft
             ? 'Announcement created.'
             : ($isScheduled ? 'Announcement created and scheduled.' : 'Announcement created and published.');
@@ -554,7 +554,7 @@ class AnnouncementController extends Controller
             'source_id' => $announcement->id,
         ]);
 
-        $editRoute = auth()->user()->role === 'super_admin' ? 'master.announcements.edit' : 'admin.announcements.edit';
+        $editRoute = auth()->user()->role === 'super_admin' ? 'super-admin.announcements.edit' : 'admin.announcements.edit';
         return redirect()->route($editRoute, $copy)->with('success', 'Announcement duplicated as a draft.');
     }
 

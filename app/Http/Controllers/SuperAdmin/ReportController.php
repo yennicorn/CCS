@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
@@ -18,7 +18,7 @@ class ReportController extends Controller
             'gender_distribution' => Application::selectRaw("COALESCE(NULLIF(gender, ''), 'unspecified') as gender, COUNT(*) total")->groupBy('gender')->pluck('total', 'gender'),
         ];
 
-        return view('master.reports', compact('report'));
+        return view('super-admin.reports', compact('report'));
     }
 
     public function exportCsv()

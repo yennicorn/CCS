@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
@@ -42,7 +42,7 @@ class AuditLogController extends Controller
         $actionOptions = AuditLog::query()->select('action')->distinct()->orderBy('action')->pluck('action');
         $entityTypeOptions = AuditLog::query()->select('entity_type')->distinct()->orderBy('entity_type')->pluck('entity_type');
 
-        return view('master.audit-logs', compact(
+        return view('super-admin.audit-logs', compact(
             'logs',
             'search',
             'action',

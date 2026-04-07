@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'School Year Control')
 @section('page_subtitle', 'One active school year at a time, with enrollment controls for that active year only')
@@ -15,7 +15,7 @@
             <h4>Create Incoming School Year</h4>
             <p class="muted">Incoming school years stay inactive for setup and cannot accept enrollment until activated.</p>
         </div>
-        <form method="POST" action="{{ route('master.school-years.store') }}" class="action-inline">
+        <form method="POST" action="{{ route('super-admin.school-years.store') }}" class="action-inline">
             @csrf
             <div style="min-width: 220px;">
                 <label>School Year</label>
@@ -49,7 +49,7 @@
             </span>
         </div>
         @if($activeSchoolYear)
-            <form method="POST" action="{{ route('master.school-years.toggle', $activeSchoolYear) }}">
+            <form method="POST" action="{{ route('super-admin.school-years.toggle', $activeSchoolYear) }}">
                 @csrf
                 <button class="btn {{ $activeSchoolYear->isEnrollmentSwitchOpen() ? 'btn-danger' : 'btn-secondary' }}" type="submit">
                     {{ $activeSchoolYear->isEnrollmentSwitchOpen() ? 'Set Closed' : 'Set Open' }}
@@ -64,7 +64,7 @@
                 <h4>Active Year Enrollment Window</h4>
                 <p class="muted">Optional date range. When set, enrollment is open only within this window.</p>
             </div>
-            <form method="POST" action="{{ route('master.school-years.enrollment-window', $activeSchoolYear) }}" class="action-inline">
+            <form method="POST" action="{{ route('super-admin.school-years.enrollment-window', $activeSchoolYear) }}" class="action-inline">
                 @csrf
                 @method('PUT')
                 <div style="min-width: 240px;">
@@ -138,14 +138,14 @@
                         @elseif(($supportsLocking ?? false) && $sy->is_locked)
                             <span class="muted">Locked year cannot be activated.</span>
                         @else
-                            <form method="POST" action="{{ route('master.school-years.set-active', $sy) }}">
+                            <form method="POST" action="{{ route('super-admin.school-years.set-active', $sy) }}">
                                 @csrf
                                 <button class="btn" type="submit">Set Active</button>
                             </form>
                         @endif
 
                         @if(($supportsLocking ?? false) && !$sy->is_active && !$sy->is_locked)
-                            <form method="POST" action="{{ route('master.school-years.lock', $sy) }}">
+                            <form method="POST" action="{{ route('super-admin.school-years.lock', $sy) }}">
                                 @csrf
                                 <button class="btn btn-secondary" type="submit">Lock</button>
                             </form>

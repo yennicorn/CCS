@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -12,7 +12,7 @@ class UserManagementController extends Controller
     public function index()
     {
         $users = User::orderBy('role')->orderBy('full_name')->paginate(20);
-        return view('master.users', compact('users'));
+        return view('super-admin.users', compact('users'));
     }
 
     public function toggleActive(User $user)
@@ -53,4 +53,3 @@ class UserManagementController extends Controller
         return back()->with('success', 'User role updated.');
     }
 }
-

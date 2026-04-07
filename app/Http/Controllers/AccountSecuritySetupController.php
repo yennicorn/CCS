@@ -67,7 +67,7 @@ class AccountSecuritySetupController extends Controller
             'force_password_change' => false,
         ])->save();
 
-        return redirect()->route($user->role === 'super_admin' ? 'master.dashboard' : 'admin.dashboard')
+        return redirect()->route($user->role === 'super_admin' ? 'super-admin.dashboard' : 'admin.dashboard')
             ->with('success', 'Account security setup completed.');
     }
 
@@ -87,4 +87,3 @@ class AccountSecuritySetupController extends Controller
         return $domains !== [] ? $domains : ['ccs.local'];
     }
 }
-

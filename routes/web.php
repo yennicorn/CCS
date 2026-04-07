@@ -9,13 +9,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\EndUser\ApplicationController;
 use App\Http\Controllers\EndUser\HomepageController;
-use App\Http\Controllers\Master\BackupController;
-use App\Http\Controllers\Master\DecisionController;
-use App\Http\Controllers\Master\MasterDashboardController;
-use App\Http\Controllers\Master\ReportController;
-use App\Http\Controllers\Master\AuditLogController;
-use App\Http\Controllers\Master\SettingsController;
-use App\Http\Controllers\Master\UserManagementController;
+use App\Http\Controllers\SuperAdmin\BackupController;
+use App\Http\Controllers\SuperAdmin\DecisionController;
+use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\ReportController;
+use App\Http\Controllers\SuperAdmin\AuditLogController;
+use App\Http\Controllers\SuperAdmin\SettingsController;
+use App\Http\Controllers\SuperAdmin\UserManagementController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
         }
 
         return match (auth()->user()->role) {
-            'super_admin' => redirect()->route('master.dashboard'),
+            'super_admin' => redirect()->route('super-admin.dashboard'),
             'admin' => redirect()->route('admin.dashboard'),
             'parent', 'student' => redirect()->route('homepage.feed'),
             default => redirect()->route('homepage.feed'),
@@ -50,8 +50,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/home', fn () => redirect()->route('dashboard'));
 
-    Route::get('/master-dashboard/{any?}', function (?string $any = null) {
-        $target = '/super-dashboard';
+    Route::get('/super-admin-dashboard/{any?}', function (?string $any = null) {
+        $target = '/superadmin-dashboard';
+
+        if ($any) {
+            $target .= '/'.$any;
+        }
+
+        return redirect($target);
+    })->where('any', '.*');
+
+    Route::get('/super-dashboard/{any?}', function (?string $any = null) {
+        $target = '/superadmin-dashboard';
 
         if ($any) {
             $target .= '/'.$any;
@@ -124,7 +134,10 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:admin'])
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings/profile', [AdminSettingsController::class, 'updateProfile'])->name('settings.profile.update');
         Route::post('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+        Route::post('/settings/profile-photo', [AdminSettingsController::class, 'updateProfilePhoto'])->name('settings.profile-photo.update');
+        Route::post('/settings/profile-photo/remove', [AdminSettingsController::class, 'removeProfilePhoto'])->name('settings.profile-photo.remove');
         Route::get('/applications', [AdminDashboardController::class, 'applications'])->name('applications.index');
         Route::get('/monitoring', [AdminDashboardController::class, 'monitoring'])->name('monitoring');
         Route::get('/monitoring/hardcopy/create', [AdminDashboardController::class, 'createOfflineEnrollment'])->name('monitoring.hardcopy.create');
@@ -145,26 +158,26 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:admin'])
     });
 
 Route::middleware(['auth', 'active', 'force.password.change', 'role:super_admin'])
-    ->prefix('super-dashboard')
-    ->name('master.')
+    ->prefix('superadmin-dashboard')
+    ->name('super-admin.')
     ->group(function () {
-        Route::get('/', [MasterDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/monitoring', [MasterDashboardController::class, 'monitoring'])->name('monitoring');
-        Route::get('/enrollment-history', [MasterDashboardController::class, 'enrollmentHistory'])->name('enrollment-history');
-        Route::get('/enrolled-students', [MasterDashboardController::class, 'enrolledStudents'])->name('enrolled-students');
-        Route::get('/monitoring/{application}', [MasterDashboardController::class, 'showMonitoringApplication'])->name('monitoring.show');
-        Route::post('/monitoring/{application}/unlock-edit', [MasterDashboardController::class, 'unlockMonitoringEdit'])->name('monitoring.unlock-edit');
-        Route::put('/monitoring/{application}', [MasterDashboardController::class, 'updateMonitoringApplication'])->name('monitoring.update');
-        Route::get('/enrollment', [MasterDashboardController::class, 'enrollment'])->name('enrollment');
-        Route::get('/school-years', [MasterDashboardController::class, 'schoolYears'])->name('school-years.index');
-        Route::get('/backup', [MasterDashboardController::class, 'backup'])->name('backup.index');
+        Route::get('/', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/monitoring', [SuperAdminDashboardController::class, 'monitoring'])->name('monitoring');
+        Route::get('/enrollment-history', [SuperAdminDashboardController::class, 'enrollmentHistory'])->name('enrollment-history');
+        Route::get('/enrolled-students', [SuperAdminDashboardController::class, 'enrolledStudents'])->name('enrolled-students');
+        Route::get('/monitoring/{application}', [SuperAdminDashboardController::class, 'showMonitoringApplication'])->name('monitoring.show');
+        Route::post('/monitoring/{application}/unlock-edit', [SuperAdminDashboardController::class, 'unlockMonitoringEdit'])->name('monitoring.unlock-edit');
+        Route::put('/monitoring/{application}', [SuperAdminDashboardController::class, 'updateMonitoringApplication'])->name('monitoring.update');
+        Route::get('/enrollment', [SuperAdminDashboardController::class, 'enrollment'])->name('enrollment');
+        Route::get('/school-years', [SuperAdminDashboardController::class, 'schoolYears'])->name('school-years.index');
+        Route::get('/backup', [SuperAdminDashboardController::class, 'backup'])->name('backup.index');
         Route::post('/applications/{application}/decision', [DecisionController::class, 'decide'])->name('applications.decide');
-        Route::delete('/enrollees/{application}/duplicate', [MasterDashboardController::class, 'destroyDuplicateEnrollee'])->name('enrollees.destroy-duplicate');
-        Route::post('/school-years/{schoolYear}/toggle-enrollment', [MasterDashboardController::class, 'toggleEnrollment'])->name('school-years.toggle');
-        Route::post('/school-years/{schoolYear}/set-active', [MasterDashboardController::class, 'setActive'])->name('school-years.set-active');
-        Route::post('/school-years', [MasterDashboardController::class, 'storeSchoolYear'])->name('school-years.store');
-        Route::post('/school-years/{schoolYear}/lock', [MasterDashboardController::class, 'lockSchoolYear'])->name('school-years.lock');
-        Route::put('/school-years/{schoolYear}/enrollment-window', [MasterDashboardController::class, 'updateEnrollmentWindow'])->name('school-years.enrollment-window');
+        Route::delete('/enrollees/{application}/duplicate', [SuperAdminDashboardController::class, 'destroyDuplicateEnrollee'])->name('enrollees.destroy-duplicate');
+        Route::post('/school-years/{schoolYear}/toggle-enrollment', [SuperAdminDashboardController::class, 'toggleEnrollment'])->name('school-years.toggle');
+        Route::post('/school-years/{schoolYear}/set-active', [SuperAdminDashboardController::class, 'setActive'])->name('school-years.set-active');
+        Route::post('/school-years', [SuperAdminDashboardController::class, 'storeSchoolYear'])->name('school-years.store');
+        Route::post('/school-years/{schoolYear}/lock', [SuperAdminDashboardController::class, 'lockSchoolYear'])->name('school-years.lock');
+        Route::put('/school-years/{schoolYear}/enrollment-window', [SuperAdminDashboardController::class, 'updateEnrollmentWindow'])->name('school-years.enrollment-window');
         Route::resource('announcements', AnnouncementController::class)->except(['show']);
         Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
         Route::post('announcements/{announcement}/restore', [AnnouncementController::class, 'restore'])->name('announcements.restore');
@@ -183,5 +196,8 @@ Route::middleware(['auth', 'active', 'force.password.change', 'role:super_admin'
         Route::post('/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
         Route::post('/settings/password', [SettingsController::class, 'updateOwnPassword'])->name('settings.password.update');
+        Route::post('/settings/profile-photo', [SettingsController::class, 'updateProfilePhoto'])->name('settings.profile-photo.update');
+        Route::post('/settings/profile-photo/remove', [SettingsController::class, 'removeProfilePhoto'])->name('settings.profile-photo.remove');
     });

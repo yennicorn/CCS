@@ -1,4 +1,4 @@
-@extends('layouts.master-admin')
+@extends('layouts.super-admin')
 
 @section('page_title', 'Enrollment History')
 @section('page_subtitle', 'All enrollment submissions linked to registered parent/student accounts')
@@ -9,11 +9,11 @@
         <h3>Search Enrollment History</h3>
         <p class="muted">Filter by account name, learner name, username, or email.</p>
     </div>
-    <form method="GET" action="{{ route('master.enrollment-history') }}" class="action-inline">
+    <form method="GET" action="{{ route('super-admin.enrollment-history') }}" class="action-inline">
         <input type="text" name="name" value="{{ $nameFilter ?? '' }}" placeholder="Enter name..." style="max-width: 360px;">
         <button class="btn" type="submit">Search</button>
         @if(!empty($nameFilter))
-            <a class="btn btn-secondary" href="{{ route('master.enrollment-history') }}">Clear</a>
+            <a class="btn btn-secondary" href="{{ route('super-admin.enrollment-history') }}">Clear</a>
         @endif
     </form>
     @if(!empty($nameFilter))
